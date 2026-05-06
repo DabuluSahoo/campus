@@ -6,7 +6,8 @@ import {
   MessageSquare, 
   User, 
   LogOut,
-  ShoppingBag
+  ShoppingBag,
+  Loader2
 } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
@@ -23,16 +24,34 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Check session
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+      } catch (err) {
+        console.error("Auth session error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    // Safety timeout to prevent infinite blank screen
+    const timeout = setTimeout(() => {
+      if (loading) setLoading(false);
+    }, 5000);
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -95,7 +114,11 @@ const App = () => {
     </nav>
   );
 
-  if (loading) return null;
+  if (loading) return (
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0b' }}>
+      <Loader2 className="animate-spin" size={40} color="#6366f1" />
+    </div>
+  );
 
   return (
     <Router>
