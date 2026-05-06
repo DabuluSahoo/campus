@@ -98,8 +98,31 @@ const Profile = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this listing?")) return;
+    const itemToDelete = myListings.find(item => item.id === id);
+    if (!itemToDelete) return;
+    
+    if (!window.confirm("Are you sure you want to delete this listing? All images will be removed permanently.")) return;
+    
     try {
+      // 1. Delete image from Storage if it exists
+      if (itemToDelete.image_url && itemToDelete.image_url.includes('item-images')) {
+        try {
+          // Extract the path after 'item-images/'
+          const pathParts = itemToDelete.image_url.split('item-images/');
+          if (pathParts.length > 1) {
+            const filePath = pathParts[1];
+            const { error: storageError } = await supabase.storage
+              .from('item-images')
+              .remove([filePath]);
+            
+            if (storageError) console.warn("Storage deletion error:", storageError);
+          }
+        } catch (err) {
+          console.error("Error parsing image URL for deletion:", err);
+        }
+      }
+
+      // 2. Delete record from Database
       const { error } = await supabase
         .from('items')
         .delete()
@@ -109,6 +132,7 @@ const Profile = () => {
       setMyListings(myListings.filter(item => item.id !== id));
     } catch (err) {
       console.error(err);
+      alert("Failed to delete listing");
     }
   };
 
