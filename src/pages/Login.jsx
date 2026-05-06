@@ -127,6 +127,28 @@ const Login = () => {
               )}
               {loading ? 'Processing...' : (isRegister ? 'Create Account' : 'Sign In')}
             </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0' }}>
+              <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
+              <span style={{ padding: '0 1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>OR</span>
+              <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
+            </div>
+
+            <button 
+              type="button" 
+              onClick={async () => {
+                setLoading(true);
+                const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+                if (error) setError(error.message);
+                setLoading(false);
+              }}
+              className="btn btn-secondary" 
+              style={{ width: '100%', justifyContent: 'center' }}
+              disabled={loading}
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: '18px', marginRight: '0.5rem' }} />
+              Continue with Google
+            </button>
           </form>
         )}
 
