@@ -18,7 +18,7 @@ const Login = () => {
 
     try {
       if (isRegister) {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -28,21 +28,39 @@ const Login = () => {
             }
           }
         });
-        if (error) throw error;
+        if (signUpError) throw signUpError;
         if (data.user && data.session === null) {
           setVerificationSent(true);
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password
         });
-        if (error) throw error;
+        if (signInError) throw signInError;
       }
     } catch (err) {
       console.error(err);
-      setError(err.message);
+      setError(err.message || 'An error occurred');
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (oauthError) throw oauthError;
+    } catch (err) {
+      console.error(err);
+      setError(err.message || 'Failed to start Google login');
       setLoading(false);
     }
   };
@@ -53,7 +71,8 @@ const Login = () => {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: '80vh'
+      minHeight: '80vh',
+      padding: '1rem'
     }}>
       <div className="glass-card" style={{
         padding: '3rem',
@@ -64,7 +83,7 @@ const Login = () => {
         <h1 style={{ marginBottom: '0.5rem', fontSize: '2rem' }}>
           {isRegister ? 'Join Campus Market' : 'Welcome Back'}
         </h1>
-        <p style={{ marginBottom: '2rem' }}>
+        <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
           {isRegister ? 'Start selling and buying within your campus.' : 'The premium student marketplace.'}
         </p>
 
@@ -72,7 +91,7 @@ const Login = () => {
           <div className="glass" style={{ padding: '2rem', borderColor: 'var(--tertiary-color)' }}>
             <CheckCircle size={48} style={{ color: 'var(--tertiary-color)', marginBottom: '1rem' }} />
             <h2 style={{ marginBottom: '0.5rem' }}>Verify your email</h2>
-            <p>We've sent a verification link to <strong>{email}</strong>. Please check your inbox and click the link to activate your account.</p>
+            <p>We've sent a verification link to <strong>{email}</strong>. Please check your inbox.</p>
             <button 
               className="btn btn-secondary" 
               style={{ marginTop: '1.5rem' }}
@@ -120,12 +139,8 @@ const Login = () => {
             {error && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginBottom: '1rem' }}>{error}</p>}
 
             <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} disabled={loading}>
-              {loading ? (
-                <Loader2 className="animate-spin" size={20} />
-              ) : (
-                isRegister ? <UserPlus size={20} /> : <LogIn size={20} />
-              )}
-              {loading ? 'Processing...' : (isRegister ? 'Create Account' : 'Sign In')}
+              {loading ? <Loader2 className="animate-spin" size={20} /> : (isRegister ? <UserPlus size={20} /> : <LogIn size={20} />)}
+              {' '}{loading ? 'Processing...' : (isRegister ? 'Create Account' : 'Sign In')}
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0' }}>
@@ -136,12 +151,7 @@ const Login = () => {
 
             <button 
               type="button" 
-              onClick={async () => {
-                setLoading(true);
-                const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-                if (error) setError(error.message);
-                setLoading(false);
-              }}
+              onClick={handleGoogleLogin}
               className="btn btn-secondary" 
               style={{ width: '100%', justifyContent: 'center' }}
               disabled={loading}
