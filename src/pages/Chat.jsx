@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Send, User, Search, MessageCircle, Loader2 } from 'lucide-react';
+import { Send, User, Search, MessageCircle, Loader2, Trash2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 const Chat = () => {
@@ -172,6 +172,28 @@ const Chat = () => {
     if (error) console.error(error);
   };
 
+  const handleDeleteConversation = async () => {
+    if (!selectedContact || !currentUser) return;
+    if (!window.confirm(`Are you sure you want to clear the conversation with ${selectedContact.email}? This cannot be undone.`)) return;
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedContact.id}),and(sender_id.eq.${selectedContact.id},receiver_id.eq.${currentUser.id})`);
+
+      if (error) throw error;
+
+      setMessages([]);
+      setContacts(prev => prev.filter(c => c.id !== selectedContact.id));
+      setSelectedContact(null);
+      setItemContext(null);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to clear conversation");
+    }
+  };
+
   if (loading) return (
     <div style={{ display: 'flex', justifyContent: 'center', padding: '10rem' }}>
       <Loader2 className="animate-spin" size={40} color="var(--primary-color)" />
@@ -271,6 +293,14 @@ const Chat = () => {
                   <p style={{ fontSize: '0.75rem', color: 'var(--tertiary-color)' }}>Online</p>
                 </div>
               </div>
+              <button 
+                onClick={handleDeleteConversation}
+                className="btn btn-secondary" 
+                style={{ color: '#ef4444', padding: '0.5rem', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+                title="Clear Conversation"
+              >
+                <Trash2 size={20} />
+              </button>
             </div>
 
             {itemContext && (
