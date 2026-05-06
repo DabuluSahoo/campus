@@ -10,6 +10,7 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [contacts, setContacts] = useState([]);
   const [selectedContact, setSelectedContact] = useState(null);
+  const [itemContext, setItemContext] = useState(null);
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
 
@@ -101,6 +102,27 @@ const Chat = () => {
 
       if (error) console.error(error);
       setMessages(data || []);
+
+      // Get item context from the first message that has an item_id
+      const itemMsg = data?.find(m => m.item_id);
+      if (itemMsg) {
+        const { data: item } = await supabase
+          .from('items')
+          .select('title, price, image_url')
+          .eq('id', itemMsg.item_id)
+          .single();
+        setItemContext(item);
+      } else if (location.state?.itemId) {
+        // Fallback to location state if no messages have item_id yet
+        const { data: item } = await supabase
+          .from('items')
+          .select('title, price, image_url')
+          .eq('id', location.state.itemId)
+          .single();
+        setItemContext(item);
+      } else {
+        setItemContext(null);
+      }
     };
 
     fetchMessages();
@@ -250,6 +272,24 @@ const Chat = () => {
                 </div>
               </div>
             </div>
+
+            {itemContext && (
+              <div style={{ 
+                padding: '0.75rem 2rem', 
+                background: 'rgba(99, 102, 241, 0.05)', 
+                borderBottom: '1px solid var(--border-color)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <img src={itemContext.image_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '0.5rem', objectFit: 'cover' }} />
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: '600' }}>{itemContext.title}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--primary-color)', fontWeight: '700' }}>${itemContext.price}</p>
+                </div>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.5rem', borderRadius: '1rem' }}>Interested In</span>
+              </div>
+            )}
 
             <div style={{ flex: 1, padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {messages.map((msg, idx) => (
