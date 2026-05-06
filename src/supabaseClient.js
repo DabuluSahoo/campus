@@ -1,6 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://cosuxwoxdylzmpwufsyj.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNvc3V4d294ZHlsem1wd3Vmc3lqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMzc3NDEsImV4cCI6MjA5MzYxMzc0MX0.MBl436o0ozUeWkKpWznURs3EJKAnHSW7lQdXn6LaLdg'
+// Using environment variables for security
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn("Supabase credentials missing! Ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your .env file or Vercel settings.")
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
