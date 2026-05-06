@@ -20,13 +20,19 @@ const Chat = () => {
       setCurrentUser(user);
 
       if (location.state?.recipientId) {
+        // Fetch recipient profile name
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', location.state.recipientId)
+          .single();
+
         const newContact = {
           id: location.state.recipientId,
-          email: location.state.recipientEmail,
+          email: profile?.full_name || location.state.recipientEmail,
           itemTitle: location.state.itemTitle
         };
         setSelectedContact(newContact);
-        // Add to contacts if not already there
         setContacts(prev => {
           if (prev.find(c => c.id === newContact.id)) return prev;
           return [newContact, ...prev];
@@ -37,13 +43,11 @@ const Chat = () => {
     initChat();
   }, [location.state]);
 
-  // Fetch conversations (unique users we've chatted with)
+  // Fetch conversations with real names
   useEffect(() => {
     if (!currentUser) return;
 
     const fetchContacts = async () => {
-      // In a real app, you might have a 'conversations' table
-      // Here we'll derive it from messages for simplicity
       const { data, error } = await supabase
         .from('messages')
         .select('sender_id, receiver_id')
@@ -57,12 +61,20 @@ const Chat = () => {
         if (msg.receiver_id !== currentUser.id) uniqueIds.add(msg.receiver_id);
       });
 
-      // Map IDs to dummy contact data (in real app, fetch user profiles)
-      const contactList = Array.from(uniqueIds).map(id => ({
-        id,
-        email: `User ${id.substring(0, 5)}...`,
+      const contactIds = Array.from(uniqueIds);
+      if (contactIds.length === 0) return;
+
+      // Fetch profiles for all unique IDs
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, username')
+        .in('id', contactIds);
+
+      const contactList = profiles?.map(p => ({
+        id: p.id,
+        email: p.full_name || p.username,
         lastMessage: 'Click to view'
-      }));
+      })) || [];
       
       setContacts(prev => {
         const merged = [...prev];
@@ -80,7 +92,6 @@ const Chat = () => {
   useEffect(() => {
     if (!currentUser || !selectedContact) return;
 
-    // Fetch existing messages
     const fetchMessages = async () => {
       const { data, error } = await supabase
         .from('messages')
@@ -94,7 +105,6 @@ const Chat = () => {
 
     fetchMessages();
 
-    // Subscribe to new messages
     const channel = supabase
       .channel('schema-db-changes')
       .on(
@@ -133,7 +143,6 @@ const Chat = () => {
       item_id: location.state?.itemId || null
     };
 
-    // Optimistic update
     setMessages(prev => [...prev, { ...messageObj, created_at: new Date().toISOString() }]);
     setNewMessage('');
 
@@ -154,7 +163,6 @@ const Chat = () => {
       overflow: 'hidden',
       borderRadius: '1.5rem'
     }}>
-      {/* Sidebar */}
       <div style={{ 
         width: '350px', 
         borderRight: '1px solid var(--border-color)',
@@ -205,7 +213,7 @@ const Chat = () => {
               </div>
               <div style={{ flex: 1, overflow: 'hidden' }}>
                 <h4 style={{ fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {contact.email.split('@')[0]}
+                  {contact.email}
                 </h4>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {contact.itemTitle ? `Re: ${contact.itemTitle}` : contact.lastMessage}
@@ -222,7 +230,6 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Main Chat Area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {selectedContact ? (
           <>
@@ -238,7 +245,7 @@ const Chat = () => {
                   <User size={20} color="var(--primary-color)" />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.1rem' }}>{selectedContact.email.split('@')[0]}</h3>
+                  <h3 style={{ fontSize: '1.1rem' }}>{selectedContact.email}</h3>
                   <p style={{ fontSize: '0.75rem', color: 'var(--tertiary-color)' }}>Online</p>
                 </div>
               </div>

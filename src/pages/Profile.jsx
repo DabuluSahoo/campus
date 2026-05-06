@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Package, Heart, Star, Edit3, Trash2, CheckCircle, Loader2 } from 'lucide-react';
+import { User, Package, Heart, Star, Edit3, Trash2, CheckCircle, Loader2, Save, X } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 const Profile = () => {
@@ -7,36 +7,81 @@ const Profile = () => {
   const [myListings, setMyListings] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // Edit form state
+  const [editName, setEditName] = useState('');
+  const [editHostel, setEditHostel] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      
-      setLoading(true);
-      try {
+    fetchProfileData();
+  }, []);
+
+  const fetchProfileData = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      // Fetch profile from our new profiles table
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (profile) {
         setUserData({
           email: user.email,
-          name: user.user_metadata?.full_name || user.email.split('@')[0],
-          trustScore: user.user_metadata?.trust_score || 100
+          name: profile.full_name || user.email.split('@')[0],
+          hostel: profile.hostel || 'Not set',
+          trustScore: 100
         });
-
-        const { data, error } = await supabase
-          .from('items')
-          .select('*')
-          .eq('seller_id', user.id);
-        
-        if (error) throw error;
-        setMyListings(data || []);
-      } catch (error) {
-        console.error("Error fetching profile data: ", error);
-      } finally {
-        setLoading(false);
+        setEditName(profile.full_name || '');
+        setEditHostel(profile.hostel || '');
       }
-    };
 
-    fetchUserData();
-  }, []);
+      const { data: items, error: itemsError } = await supabase
+        .from('items')
+        .select('*')
+        .eq('seller_id', user.id);
+      
+      if (itemsError) throw itemsError;
+      setMyListings(items || []);
+    } catch (error) {
+      console.error("Error fetching profile data: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    const { data: { user } } = await supabase.auth.getUser();
+    setSaving(true);
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: editName,
+          hostel: editHostel,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      
+      setUserData(prev => ({ ...prev, name: editName, hostel: editHostel }));
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleMarkSold = async (id) => {
     try {
@@ -75,29 +120,66 @@ const Profile = () => {
 
   return (
     <div className="animate-fade-in">
-      <div className="glass-card" style={{ padding: '3rem', marginBottom: '3rem', display: 'flex', gap: '3rem', alignItems: 'center' }}>
+      <div className="glass-card" style={{ padding: '3rem', marginBottom: '3rem', display: 'flex', gap: '3rem', alignItems: 'center', position: 'relative' }}>
         <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <User size={60} color="white" />
         </div>
+        
         <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{userData?.name || 'Student'}</h1>
-          <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>{userData?.email}</p>
-          <div style={{ display: 'flex', gap: '2rem' }}>
-            <div>
-              <span style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                {myListings.filter(i => i.status === 'sold').length}
-              </span>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Items Sold</p>
-            </div>
-            <div>
-              <span style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--tertiary-color)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                {userData?.trustScore || 100} <Star size={18} fill="var(--tertiary-color)" />
-              </span>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Rating</p>
-            </div>
-          </div>
+          {isEditing ? (
+            <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px' }}>
+              <input 
+                type="text" 
+                className="input-field" 
+                placeholder="Your Full Name"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                required
+              />
+              <input 
+                type="text" 
+                className="input-field" 
+                placeholder="Your Hostel/Location"
+                value={editHostel}
+                onChange={(e) => setEditHostel(e.target.value)}
+              />
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button type="submit" className="btn btn-primary" disabled={saving}>
+                  {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />} Save Changes
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => setIsEditing(false)}>
+                  <X size={18} /> Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{userData?.name}</h1>
+              <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>
+                {userData?.email} • <span style={{ color: 'var(--primary-color)' }}>{userData?.hostel}</span>
+              </p>
+              <div style={{ display: 'flex', gap: '2rem' }}>
+                <div>
+                  <span style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                    {myListings.filter(i => i.status === 'sold').length}
+                  </span>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Items Sold</p>
+                </div>
+                <div>
+                  <span style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--tertiary-color)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    {userData?.trustScore || 100} <Star size={18} fill="var(--tertiary-color)" />
+                  </span>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Rating</p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
-        <button className="btn btn-secondary">Edit Profile</button>
+        {!isEditing && (
+          <button className="btn btn-secondary" onClick={() => setIsEditing(true)}>
+            <Edit3 size={18} /> Edit Profile
+          </button>
+        )}
       </div>
 
       <div style={{ display: 'flex', gap: '2rem', borderBottom: '1px solid var(--border-color)', marginBottom: '2.5rem' }}>
