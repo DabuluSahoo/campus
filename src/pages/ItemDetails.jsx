@@ -1,39 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, User, MessageSquare, Heart, ChevronLeft, ShieldCheck, Tag, Calendar, Loader2 } from 'lucide-react';
+import { 
+  MapPin, 
+  Tag, 
+  Clock, 
+  User, 
+  MessageCircle, 
+  ChevronLeft, 
+  Loader2,
+  ShieldCheck,
+  Share2,
+  Heart
+} from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 const ItemDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [item, setItem] = useState(null);
+  const [seller, setSeller] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authUser, setAuthUser] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setAuthUser(user);
-    });
-
-    const fetchItem = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const { data, error } = await supabase
+        const { data: { user } } = await supabase.auth.getUser();
+        setAuthUser(user);
+
+        // Fetch item
+        const { data: itemData, error: itemError } = await supabase
           .from('items')
           .select('*')
           .eq('id', id)
           .single();
         
-        if (error) throw error;
-        setItem(data);
-      } catch (err) {
-        console.error(err);
-        navigate('/dashboard');
+        if (itemError) throw itemError;
+        setItem(itemData);
+
+        // Fetch seller profile
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('id', itemData.seller_id)
+          .single();
+        
+        setSeller(profileData);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchItem();
-  }, [id, navigate]);
+
+    fetchData();
+  }, [id]);
+
+  const handleContact = () => {
+    navigate('/chat', { state: { sellerId: item.seller_id, itemId: item.id } });
+  };
 
   if (loading) return (
     <div style={{ display: 'flex', justifyContent: 'center', padding: '10rem' }}>
@@ -41,88 +67,92 @@ const ItemDetails = () => {
     </div>
   );
 
-  if (!item) return null;
+  if (!item) return <div style={{ textAlign: 'center', padding: '5rem' }}>Item not found</div>;
 
   return (
-    <div className="animate-fade-in">
-      <button 
-        onClick={() => navigate(-1)} 
-        className="btn btn-secondary" 
-        style={{ marginBottom: '2rem', padding: '0.5rem 1rem' }}
-      >
+    <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto' }}>
+      <button onClick={() => navigate(-1)} className="btn btn-secondary" style={{ marginBottom: '2rem', padding: '0.6rem 1rem' }}>
         <ChevronLeft size={20} /> Back to Market
       </button>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '3rem' }}>
-        <div className="glass" style={{ overflow: 'hidden', padding: '1.5rem' }}>
-          <img 
-            src={item.image_url} 
-            alt={item.title} 
-            style={{ width: '100%', borderRadius: '0.75rem', marginBottom: '1.5rem', maxHeight: '500px', objectFit: 'cover' }} 
-          />
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-            <span className="glass" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <Tag size={16} className="text-primary" style={{ color: 'var(--primary-color)' }} /> {item.category}
-            </span>
-            <span className="glass" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <Calendar size={16} className="text-primary" style={{ color: 'var(--primary-color)' }} /> {item.status === 'active' ? 'Available' : 'Sold'}
-            </span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '3rem' }}>
+        {/* Left Side: Images */}
+        <div style={{ position: 'relative' }}>
+          <div className="glass-card" style={{ borderRadius: '2rem', overflow: 'hidden', height: '500px' }}>
+            <img 
+              src={item.image_url} 
+              alt={item.title} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
           </div>
-          <h1 style={{ fontSize: '2.25rem', marginBottom: '1rem' }}>{item.title}</h1>
-          <p style={{ fontSize: '1.1rem', lineHeight: '1.7', color: 'var(--text-secondary)' }}>{item.description}</p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div className="glass-card" style={{ padding: '2rem' }}>
-            <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: 'var(--primary-color)' }}>${item.price}</h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-              <MapPin size={18} />
-              <span>Available at {item.location}</span>
+        {/* Right Side: Info */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+              <h1 style={{ fontSize: '2.5rem' }}>{item.title}</h1>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button className="btn btn-secondary" style={{ padding: '0.5rem' }}><Heart size={20} /></button>
+                <button className="btn btn-secondary" style={{ padding: '0.5rem' }}><Share2 size={20} /></button>
+              </div>
+            </div>
+            
+            <p style={{ fontSize: '2rem', fontWeight: '800', color: 'var(--primary-color)', marginBottom: '1.5rem' }}>
+              ${item.price}
+            </p>
+
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+              <span style={{ background: 'var(--glass-bg)', padding: '0.6rem 1rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+                <Tag size={18} color="var(--primary-color)" /> {item.category}
+              </span>
+              <span style={{ background: 'var(--glass-bg)', padding: '0.6rem 1rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+                <MapPin size={18} color="var(--secondary-color)" /> {item.location}
+              </span>
+              <span style={{ background: 'var(--glass-bg)', padding: '0.6rem 1rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+                <Clock size={18} color="var(--tertiary-color)" /> 2 days ago
+              </span>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {item.seller_id !== authUser?.id && (
-                <button 
-                  onClick={() => navigate('/chat', { 
-                    state: { 
-                      recipientId: item.seller_id, 
-                      recipientEmail: item.seller_email,
-                      itemId: item.id,
-                      itemTitle: item.title
-                    } 
-                  })} 
-                  className="btn btn-primary" 
-                  style={{ width: '100%', justifyContent: 'center', height: '3.5rem' }}
-                >
-                  <MessageSquare size={20} /> Contact Seller
-                </button>
-              )}
-              <button className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center', height: '3.5rem' }}>
-                <Heart size={20} /> Add to Wishlist
-              </button>
+            <div className="glass-card" style={{ padding: '1.5rem', borderRadius: '1.5rem' }}>
+              <h3 style={{ marginBottom: '0.75rem', fontSize: '1.2rem' }}>Description</h3>
+              <p style={{ lineHeight: '1.7', color: 'var(--text-secondary)' }}>
+                {item.description}
+              </p>
             </div>
           </div>
 
-          <div className="glass" style={{ padding: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-              <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--primary-glow)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center' }}>
-                <User size={24} style={{ color: 'var(--primary-color)' }} />
-              </div>
-              <div>
-                <h4 style={{ fontSize: '1.1rem' }}>{item.seller_email?.split('@')[0] || 'Seller'}</h4>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--tertiary-color)', fontSize: '0.85rem', fontWeight: '600' }}>
-                  <ShieldCheck size={14} /> Verified Seller
-                </div>
-              </div>
+          <div className="glass-card" style={{ padding: '1.5rem', borderRadius: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <div style={{ 
+              width: '60px', 
+              height: '60px', 
+              borderRadius: '50%', 
+              background: 'var(--primary-glow)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              overflow: 'hidden'
+            }}>
+              {seller?.avatar_url ? (
+                <img src={seller.avatar_url} alt="Seller" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <User size={30} color="var(--primary-color)" />
+              )}
             </div>
-            <p style={{ fontSize: '0.875rem' }}>Campus Verified Seller.</p>
+            <div style={{ flex: 1 }}>
+              <h4 style={{ fontSize: '1.1rem', marginBottom: '0.2rem' }}>{seller?.full_name || 'Verified Seller'}</h4>
+              <p style={{ fontSize: '0.85rem', color: 'var(--tertiary-color)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                <ShieldCheck size={16} /> Verified Seller
+              </p>
+            </div>
+            {authUser?.id !== item.seller_id && (
+              <button onClick={handleContact} className="btn btn-primary">
+                <MessageCircle size={20} /> Contact Seller
+              </button>
+            )}
           </div>
         </div>
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .animate-spin { animation: spin 1s linear infinite; }
-      `}} />
     </div>
   );
 };
