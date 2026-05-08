@@ -14,37 +14,41 @@ const Chat = () => {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
 
-  // Initialize Chat from Item Details
+  // Initialize Chat and Fetch Current User
   useEffect(() => {
-    const initChat = async () => {
+    const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setCurrentUser(user);
-
-      if (location.state?.recipientId) {
-        // Fetch recipient profile name
+      
+      // If we came from ItemDetails, handle the initial contact
+      const targetSellerId = location.state?.sellerId || location.state?.recipientId;
+      if (targetSellerId && user) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name')
-          .eq('id', location.state.recipientId)
+          .select('id, full_name, avatar_url')
+          .eq('id', targetSellerId)
           .single();
 
-        const newContact = {
-          id: location.state.recipientId,
-          email: profile?.full_name || location.state.recipientEmail,
-          itemTitle: location.state.itemTitle
-        };
-        setSelectedContact(newContact);
-        setContacts(prev => {
-          if (prev.find(c => c.id === newContact.id)) return prev;
-          return [newContact, ...prev];
-        });
+        if (profile) {
+          const newContact = {
+            id: profile.id,
+            email: profile.full_name || 'User',
+            avatar_url: profile.avatar_url,
+            itemTitle: location.state?.itemTitle
+          };
+          setSelectedContact(newContact);
+          setContacts(prev => {
+            if (prev.find(c => c.id === newContact.id)) return prev;
+            return [newContact, ...prev];
+          });
+        }
       }
       setLoading(false);
     };
-    initChat();
+    init();
   }, [location.state]);
 
-  // Fetch conversations with real names
+  // Fetch all existing conversations
   useEffect(() => {
     if (!currentUser) return;
 
@@ -65,15 +69,15 @@ const Chat = () => {
       const contactIds = Array.from(uniqueIds);
       if (contactIds.length === 0) return;
 
-      // Fetch profiles for all unique IDs
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, full_name, username')
+        .select('id, full_name, avatar_url')
         .in('id', contactIds);
 
       const contactList = profiles?.map(p => ({
         id: p.id,
-        email: p.full_name || p.username,
+        email: p.full_name || 'User',
+        avatar_url: p.avatar_url,
         lastMessage: 'Click to view'
       })) || [];
       
@@ -89,7 +93,7 @@ const Chat = () => {
     fetchContacts();
   }, [currentUser]);
 
-  // Real-time Message Subscription
+  // Fetch messages for selected contact
   useEffect(() => {
     if (!currentUser || !selectedContact) return;
 
@@ -103,21 +107,15 @@ const Chat = () => {
       if (error) console.error(error);
       setMessages(data || []);
 
-      // Get item context from the first message that has an item_id
+      // Item Context Logic
       const itemMsg = data?.find(m => m.item_id);
-      if (itemMsg) {
+      const targetItemId = itemMsg?.item_id || location.state?.itemId;
+      
+      if (targetItemId) {
         const { data: item } = await supabase
           .from('items')
           .select('title, price, image_url')
-          .eq('id', itemMsg.item_id)
-          .single();
-        setItemContext(item);
-      } else if (location.state?.itemId) {
-        // Fallback to location state if no messages have item_id yet
-        const { data: item } = await supabase
-          .from('items')
-          .select('title, price, image_url')
-          .eq('id', location.state.itemId)
+          .eq('id', targetItemId)
           .single();
         setItemContext(item);
       } else {
@@ -128,15 +126,10 @@ const Chat = () => {
     fetchMessages();
 
     const channel = supabase
-      .channel('schema-db-changes')
+      .channel(`chat-${selectedContact.id}`)
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${currentUser.id}`
-        },
+        { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` },
         (payload) => {
           if (payload.new.sender_id === selectedContact.id) {
             setMessages(prev => [...prev, payload.new]);
@@ -148,7 +141,7 @@ const Chat = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentUser, selectedContact]);
+  }, [currentUser, selectedContact, location.state]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -174,15 +167,13 @@ const Chat = () => {
 
   const handleDeleteConversation = async () => {
     if (!selectedContact || !currentUser) return;
-    if (!window.confirm(`Are you sure you want to clear the conversation with ${selectedContact.email}? This cannot be undone.`)) return;
+    if (!window.confirm(`Are you sure you want to clear conversation?`)) return;
 
     try {
-      const { error } = await supabase
+      await supabase
         .from('messages')
         .delete()
         .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedContact.id}),and(sender_id.eq.${selectedContact.id},receiver_id.eq.${currentUser.id})`);
-
-      if (error) throw error;
 
       setMessages([]);
       setContacts(prev => prev.filter(c => c.id !== selectedContact.id));
@@ -190,7 +181,6 @@ const Chat = () => {
       setItemContext(null);
     } catch (err) {
       console.error(err);
-      alert("Failed to clear conversation");
     }
   };
 
@@ -207,23 +197,13 @@ const Chat = () => {
       overflow: 'hidden',
       borderRadius: '1.5rem'
     }}>
-      <div style={{ 
-        width: '350px', 
-        borderRight: '1px solid var(--border-color)',
-        display: 'flex',
-        flexDirection: 'column',
-        background: 'rgba(255, 255, 255, 0.02)'
-      }}>
+      {/* Sidebar */}
+      <div style={{ width: '350px', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', background: 'rgba(255, 255, 255, 0.02)' }}>
         <div style={{ padding: '1.5rem' }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Messages</h2>
           <div style={{ position: 'relative' }}>
             <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
-            <input 
-              type="text" 
-              className="glass" 
-              placeholder="Search chats..." 
-              style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 3rem', borderRadius: '1rem', border: '1px solid var(--border-color)', color: 'white' }} 
-            />
+            <input type="text" className="glass" placeholder="Search chats..." style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 3rem', borderRadius: '1rem', border: '1px solid var(--border-color)', color: 'white' }} />
           </div>
         </div>
 
@@ -243,75 +223,47 @@ const Chat = () => {
                 transition: 'var(--transition-smooth)'
               }}
             >
-              <div style={{ 
-                width: '48px', 
-                height: '48px', 
-                borderRadius: '50%', 
-                background: 'var(--primary-glow)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--primary-color)'
-              }}>
-                <User size={24} />
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--primary-glow)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                {contact.avatar_url ? (
+                  <img src={contact.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <User size={24} color="var(--primary-color)" />
+                )}
               </div>
               <div style={{ flex: 1, overflow: 'hidden' }}>
-                <h4 style={{ fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {contact.email}
-                </h4>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {contact.itemTitle ? `Re: ${contact.itemTitle}` : contact.lastMessage}
-                </p>
+                <h4 style={{ fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{contact.email}</h4>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{contact.lastMessage}</p>
               </div>
             </div>
           ))}
-          {contacts.length === 0 && (
-            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-              <MessageCircle size={40} style={{ marginBottom: '1rem', opacity: 0.3 }} />
-              <p>No active conversations.</p>
-            </div>
-          )}
         </div>
       </div>
 
+      {/* Chat Area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {selectedContact ? (
           <>
-            <div style={{ 
-              padding: '1.25rem 2rem', 
-              borderBottom: '1px solid var(--border-color)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
+            <div style={{ padding: '1.25rem 2rem', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary-glow)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <User size={20} color="var(--primary-color)" />
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary-glow)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                  {selectedContact.avatar_url ? (
+                    <img src={selectedContact.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <User size={20} color="var(--primary-color)" />
+                  )}
                 </div>
                 <div>
                   <h3 style={{ fontSize: '1.1rem' }}>{selectedContact.email}</h3>
                   <p style={{ fontSize: '0.75rem', color: 'var(--tertiary-color)' }}>Online</p>
                 </div>
               </div>
-              <button 
-                onClick={handleDeleteConversation}
-                className="btn btn-secondary" 
-                style={{ color: '#ef4444', padding: '0.5rem', borderColor: 'rgba(239, 68, 68, 0.2)' }}
-                title="Clear Conversation"
-              >
+              <button onClick={handleDeleteConversation} className="btn btn-secondary" style={{ color: '#ef4444', padding: '0.5rem' }}>
                 <Trash2 size={20} />
               </button>
             </div>
 
             {itemContext && (
-              <div style={{ 
-                padding: '0.75rem 2rem', 
-                background: 'rgba(99, 102, 241, 0.05)', 
-                borderBottom: '1px solid var(--border-color)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem'
-              }}>
+              <div style={{ padding: '0.75rem 2rem', background: 'rgba(99, 102, 241, 0.05)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <img src={itemContext.image_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '0.5rem', objectFit: 'cover' }} />
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: '0.85rem', fontWeight: '600' }}>{itemContext.title}</p>
@@ -323,29 +275,16 @@ const Chat = () => {
 
             <div style={{ flex: 1, padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {messages.map((msg, idx) => (
-                <div 
-                  key={idx} 
-                  style={{ 
-                    alignSelf: msg.sender_id === currentUser.id ? 'flex-end' : 'flex-start',
-                    maxWidth: '70%'
-                  }}
-                >
+                <div key={idx} style={{ alignSelf: msg.sender_id === currentUser.id ? 'flex-end' : 'flex-start', maxWidth: '70%' }}>
                   <div style={{ 
-                    padding: '1rem 1.25rem',
-                    borderRadius: msg.sender_id === currentUser.id ? '1.25rem 1.25rem 0 1.25rem' : '1.25rem 1.25rem 1.25rem 0',
-                    background: msg.sender_id === currentUser.id ? 'var(--primary-color)' : 'rgba(255, 255, 255, 0.05)',
-                    color: 'white',
-                    fontSize: '0.95rem',
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+                    padding: '1rem 1.25rem', 
+                    borderRadius: msg.sender_id === currentUser.id ? '1.25rem 1.25rem 0 1.25rem' : '1.25rem 1.25rem 1.25rem 0', 
+                    background: msg.sender_id === currentUser.id ? 'var(--primary-color)' : 'rgba(255, 255, 255, 0.05)', 
+                    color: 'white' 
                   }}>
                     {msg.content}
                   </div>
-                  <p style={{ 
-                    fontSize: '0.7rem', 
-                    color: 'var(--text-secondary)', 
-                    marginTop: '0.4rem',
-                    textAlign: msg.sender_id === currentUser.id ? 'right' : 'left'
-                  }}>
+                  <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.4rem', textAlign: msg.sender_id === currentUser.id ? 'right' : 'left' }}>
                     {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
@@ -353,34 +292,18 @@ const Chat = () => {
               <div ref={messagesEndRef} />
             </div>
 
-            <form 
-              onSubmit={handleSendMessage}
-              style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '1rem' }}
-            >
-              <input 
-                type="text" 
-                className="glass" 
-                placeholder="Type your message..." 
-                style={{ flex: 1, padding: '1rem 1.5rem', borderRadius: '1rem', border: '1px solid var(--border-color)', color: 'white' }}
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-              />
-              <button type="submit" className="btn btn-primary" style={{ padding: '0 1.5rem' }}>
-                <Send size={20} />
-              </button>
+            <form onSubmit={handleSendMessage} style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '1rem' }}>
+              <input type="text" className="glass" placeholder="Type your message..." style={{ flex: 1, padding: '1rem 1.5rem', borderRadius: '1rem', border: '1px solid var(--border-color)', color: 'white' }} value={newMessage} onChange={(e) => setNewMessage(e.target.value)} />
+              <button type="submit" className="btn btn-primary" style={{ padding: '0 1.5rem' }}><Send size={20} /></button>
             </form>
           </>
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
-            <MessageCircle size={60} style={{ marginBottom: '1.5rem', opacity: 0.2 }} />
+            <MessageCircle size={60} style={{ opacity: 0.2 }} />
             <h3>Select a conversation to start chatting</h3>
           </div>
         )}
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .animate-spin { animation: spin 1s linear infinite; }
-      `}} />
     </div>
   );
 };
