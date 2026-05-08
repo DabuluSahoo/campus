@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { User, Package, Heart, Star, Edit3, Trash2, CheckCircle, Loader2, Save, X, DollarSign, Tag, MapPin } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Package, Heart, Star, Edit3, Trash2, CheckCircle, Loader2, Save, X, Camera, Upload } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 const Profile = () => {
@@ -9,6 +9,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
   
   // Profile edit form state
   const [editName, setEditName] = useState('');
@@ -39,9 +41,11 @@ const Profile = () => {
 
       if (profile) {
         setUserData({
+          id: user.id,
           email: user.email,
           name: profile.full_name || user.email.split('@')[0],
           hostel: profile.hostel || 'Not set',
+          avatarUrl: profile.avatar_url,
           trustScore: 100
         });
         setEditName(profile.full_name || '');
@@ -60,6 +64,44 @@ const Profile = () => {
       console.error("Error fetching profile data: ", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !userData) return;
+
+    setUploadingAvatar(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${userData.id}/avatar.${fileExt}`;
+
+      // Upload image
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', userData.id);
+
+      if (updateError) throw updateError;
+
+      setUserData(prev => ({ ...prev, avatarUrl: publicUrl }));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload photo");
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -174,9 +216,63 @@ const Profile = () => {
 
   return (
     <div className="animate-fade-in">
-      <div className="glass-card" style={{ padding: '3rem', marginBottom: '3rem', display: 'flex', gap: '3rem', alignItems: 'center', position: 'relative' }}>
-        <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <User size={60} color="white" />
+      <div className="glass-card" style={{ padding: '3rem', marginBottom: '3rem', display: 'flex', gap: '3rem', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'relative' }}>
+          <div style={{ 
+            width: '140px', 
+            height: '140px', 
+            borderRadius: '50%', 
+            background: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            overflow: 'hidden',
+            border: '4px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 0 20px var(--primary-glow)'
+          }}>
+            {userData?.avatarUrl ? (
+              <img src={userData.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <User size={70} color="white" />
+            )}
+            
+            {uploadingAvatar && (
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Loader2 className="animate-spin" color="white" />
+              </div>
+            )}
+          </div>
+          
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            style={{ 
+              position: 'absolute', 
+              bottom: '5px', 
+              right: '5px', 
+              background: 'var(--primary-color)', 
+              border: 'none', 
+              borderRadius: '50%', 
+              width: '40px', 
+              height: '40px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              cursor: 'pointer',
+              color: 'white',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              zIndex: 10
+            }}
+            title="Update Profile Photo"
+          >
+            <Camera size={20} />
+          </button>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleAvatarUpload} 
+            style={{ display: 'none' }} 
+            accept="image/*"
+          />
         </div>
         
         <div style={{ flex: 1 }}>
