@@ -22,6 +22,7 @@ import Profile from './pages/Profile';
 const App = () => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     // Check session
@@ -29,6 +30,7 @@ const App = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
+        if (session) fetchUserProfile(session.user.id);
       } catch (err) {
         console.error("Auth session error:", err);
       } finally {
@@ -40,10 +42,14 @@ const App = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) {
+        fetchUserProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
       setLoading(false);
     });
 
-    // Safety timeout to prevent infinite blank screen
     const timeout = setTimeout(() => {
       if (loading) setLoading(false);
     }, 5000);
@@ -53,6 +59,15 @@ const App = () => {
       clearTimeout(timeout);
     };
   }, []);
+
+  const fetchUserProfile = async (userId) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('avatar_url')
+      .eq('id', userId)
+      .single();
+    if (data) setProfile(data);
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -91,7 +106,17 @@ const App = () => {
         <Link to="/dashboard" className="nav-link"><LayoutDashboard size={20} /></Link>
         <Link to="/post" className="nav-link"><PlusSquare size={20} /></Link>
         <Link to="/chat" className="nav-link"><MessageSquare size={20} /></Link>
-        <Link to="/profile" className="nav-link"><User size={20} /></Link>
+        <Link to="/profile" className="nav-link" style={{ padding: '0.2rem' }}>
+          {profile?.avatar_url ? (
+            <img 
+              src={profile.avatar_url} 
+              alt="Profile" 
+              style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary-color)' }} 
+            />
+          ) : (
+            <User size={20} />
+          )}
+        </Link>
         <button onClick={handleLogout} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
           <LogOut size={20} />
         </button>
@@ -126,11 +151,11 @@ const App = () => {
         {session && <Navbar />}
         <Routes>
           <Route path="/login" element={session ? <Navigate to="/dashboard" /> : <Login />} />
-          <Route path="/dashboard" element={session ? <Dashboard /> : <Navigate to="/login" />} />
-          <Route path="/post" element={session ? <PostItem /> : <Navigate to="/login" />} />
-          <Route path="/item/:id" element={session ? <ItemDetails /> : <Navigate to="/login" />} />
-          <Route path="/chat" element={session ? <Chat /> : <Navigate to="/login" />} />
-          <Route path="/profile" element={session ? <Profile /> : <Navigate to="/login" />} />
+          <Route path="/dashboard" element={session ? <Dashboard /> : <Login />} />
+          <Route path="/post" element={session ? <PostItem /> : <Login />} />
+          <Route path="/item/:id" element={session ? <ItemDetails /> : <Login />} />
+          <Route path="/chat" element={session ? <Chat /> : <Login />} />
+          <Route path="/profile" element={session ? <Profile /> : <Login />} />
           <Route path="/" element={<Navigate to="/dashboard" />} />
         </Routes>
       </div>
