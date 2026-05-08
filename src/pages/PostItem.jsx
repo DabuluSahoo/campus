@@ -153,7 +153,7 @@ const PostItem = () => {
                 <Sparkles size={18} />
                 <span style={{ fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase' }}>AI Price Suggestion</span>
               </div>
-              <h2 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>${aiSuggestion.min} - ${aiSuggestion.max}</h2>
+              <h2 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>₹{aiSuggestion.min} - ₹{aiSuggestion.max}</h2>
               <p style={{ fontSize: '0.85rem' }}>Detected as: <strong>{aiSuggestion.type}</strong></p>
               <button 
                 type="button"
@@ -186,9 +186,9 @@ const PostItem = () => {
               </select>
             </div>
             <div className="input-group">
-              <label className="input-label">Price ($)</label>
+              <label className="input-label">Price (₹)</label>
               <div style={{ position: 'relative' }}>
-                <DollarSign size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', fontWeight: 'bold' }}>₹</span>
                 <input type="number" className="input-field" style={{ paddingLeft: '2.5rem' }} placeholder="0.00" value={price} onChange={(e) => setPrice(e.target.value)} required />
               </div>
             </div>

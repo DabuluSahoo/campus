@@ -247,7 +247,7 @@ const Profile = () => {
               </div>
               <div style={{ padding: '1.25rem' }}>
                 <h3 style={{ marginBottom: '0.5rem' }}>{item.title}</h3>
-                <p style={{ fontWeight: '700', color: 'var(--primary-color)' }}>${item.price}</p>
+                <p style={{ fontWeight: '700', color: 'var(--primary-color)' }}>₹{item.price}</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '1rem' }}>
                   <button onClick={() => navigate(`/item/${item.id}`)} className="btn btn-secondary" style={{ padding: '0.5rem', fontSize: '0.8rem' }}><ExternalLink size={16} /> View</button>
                   <button onClick={() => handleDelete(item.id)} className="btn btn-secondary" style={{ padding: '0.5rem', fontSize: '0.8rem', color: '#ef4444' }}><Trash2 size={16} /> Delete</button>
@@ -264,7 +264,7 @@ const Profile = () => {
               </div>
               <div style={{ padding: '1.25rem' }}>
                 <h3 style={{ marginBottom: '0.5rem' }}>{item.title}</h3>
-                <p style={{ fontWeight: '700', color: 'var(--primary-color)' }}>${item.price}</p>
+                <p style={{ fontWeight: '700', color: 'var(--primary-color)' }}>₹{item.price}</p>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem' }}><MapPin size={14} /> {item.location}</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '1.25rem' }}>
                   <button onClick={() => navigate(`/item/${item.id}`)} className="btn btn-primary" style={{ padding: '0.5rem', fontSize: '0.8rem' }}><ExternalLink size={16} /> View Item</button>

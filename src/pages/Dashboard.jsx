@@ -156,7 +156,7 @@ const Dashboard = () => {
                 <div style={{ position: 'relative', width: '100%', paddingTop: '100%' }}>
                   <img src={item.image_url} alt={item.title} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', padding: '0.4rem 0.8rem', borderRadius: '2rem', fontWeight: '700', color: 'white', fontSize: '0.9rem' }}>
-                    ${item.price}
+                    ₹{item.price}
                   </div>
                 </div>
                 <div style={{ padding: '1.25rem' }}>

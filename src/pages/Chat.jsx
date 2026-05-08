@@ -267,7 +267,7 @@ const Chat = () => {
                 <img src={itemContext.image_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '0.5rem', objectFit: 'cover' }} />
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: '0.85rem', fontWeight: '600' }}>{itemContext.title}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--primary-color)', fontWeight: '700' }}>${itemContext.price}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--primary-color)', fontWeight: '700' }}>₹{itemContext.price}</p>
                 </div>
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.5rem', borderRadius: '1rem' }}>Interested In</span>
               </div>

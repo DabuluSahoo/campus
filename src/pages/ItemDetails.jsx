@@ -159,7 +159,7 @@ const ItemDetails = () => {
               </div>
             </div>
             
-            <p style={{ fontSize: '2rem', fontWeight: '800', color: 'var(--primary-color)', marginBottom: '1.5rem' }}>${item.price}</p>
+            <p style={{ fontSize: '2rem', fontWeight: '800', color: 'var(--primary-color)', marginBottom: '1.5rem' }}>₹{item.price}</p>
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
               <span className="glass" style={{ padding: '0.6rem 1rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
