@@ -57,18 +57,17 @@ const Dashboard = () => {
 
   return (
     <div className="animate-fade-in" style={{ padding: '0 1rem' }}>
-      {/* Clean Hero Section */}
+      {/* Cinematic Hero Section */}
       <section style={{ 
         position: 'relative', 
         borderRadius: '2.5rem', 
         overflow: 'hidden', 
         marginBottom: '4rem',
-        minHeight: '500px',
+        minHeight: '600px',
         display: 'flex',
         alignItems: 'center',
         background: '#050505'
       }}>
-        {/* Background Image with Clean Mask */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -92,8 +91,7 @@ const Dashboard = () => {
           }}></div>
         </div>
 
-        {/* Content Area */}
-        <div style={{ zIndex: 1, padding: '4rem', maxWidth: '700px' }}>
+        <div style={{ zIndex: 1, padding: '4rem', maxWidth: '750px' }}>
           <div style={{ 
             display: 'inline-flex', 
             alignItems: 'center', 
@@ -112,73 +110,33 @@ const Dashboard = () => {
           </div>
 
           <h1 style={{ 
-            fontSize: '4.5rem', 
+            fontSize: '5rem', 
             fontWeight: '900', 
-            lineHeight: '1', 
+            lineHeight: '0.95', 
             marginBottom: '1.5rem', 
             letterSpacing: '-0.04em',
             color: 'white'
           }}>
-            Trade Better.<br />
-            <span style={{ color: 'rgba(255,255,255,0.4)' }}>Live Smarter.</span>
+            TRADE BETTER.<br />
+            <span style={{ color: 'rgba(255,255,255,0.4)' }}>LIVE SMARTER.</span>
           </h1>
 
           <p style={{ 
-            fontSize: '1.2rem', 
+            fontSize: '1.25rem', 
             color: 'var(--text-secondary)', 
-            marginBottom: '3rem', 
+            marginBottom: '2rem', 
             maxWidth: '500px',
             lineHeight: '1.6'
           }}>
-            The ultra-clean marketplace for university students. 
+            The elite marketplace for university students. 
             Discover premium deals in your campus today.
           </p>
-          
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <div style={{ position: 'relative', width: '400px' }}>
-              <Search size={20} style={{ position: 'absolute', left: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
-              <input 
-                type="text" 
-                placeholder="Search listings..."
-                style={{ 
-                  width: '100%', 
-                  padding: '1.25rem 1.25rem 1.25rem 3.5rem',
-                  borderRadius: '1.25rem',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: 'white',
-                  fontSize: '1rem',
-                  background: 'rgba(255,255,255,0.05)',
-                  outline: 'none'
-                }}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-            <button 
-              onClick={() => setShowFilters(!showFilters)}
-              className="glass" 
-              style={{ 
-                borderRadius: '1.25rem', 
-                height: '3.75rem', 
-                padding: '0 1.5rem', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '0.75rem',
-                border: '1px solid var(--border-color)',
-                color: 'white',
-                cursor: 'pointer'
-              }}
-            >
-              <Filter size={18} />
-              Filter
-            </button>
-          </div>
         </div>
 
         {/* Bouncing Scroll Indicator */}
         <div style={{
           position: 'absolute',
-          bottom: '2rem',
+          bottom: '3rem',
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
@@ -186,23 +144,76 @@ const Dashboard = () => {
           alignItems: 'center',
           gap: '0.5rem',
           color: 'var(--text-secondary)',
-          opacity: 0.6,
+          opacity: 0.4,
           animation: 'bounce 2s infinite'
         }}>
-          <span style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em' }}>SCROLL</span>
+          <span style={{ fontSize: '0.65rem', fontWeight: '800', letterSpacing: '0.2em' }}>SCROLL</span>
           <ChevronDown size={24} />
         </div>
       </section>
 
-      {/* Categories */}
-      <div style={{ marginBottom: '3.5rem' }}>
+      {/* NEW: Product Controls Section */}
+      <div style={{ marginBottom: '3rem' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: '1.5rem', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          marginBottom: '2.5rem',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ position: 'relative', flex: 1, maxWidth: '600px' }}>
+            <Search size={20} style={{ position: 'absolute', left: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+            <input 
+              type="text" 
+              placeholder="Search premium listings..."
+              style={{ 
+                width: '100%', 
+                padding: '1.5rem 1.5rem 1.5rem 3.75rem',
+                borderRadius: '1.5rem',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'white',
+                fontSize: '1.1rem',
+                background: 'rgba(255,255,255,0.03)',
+                outline: 'none',
+                transition: 'all 0.3s'
+              }}
+              className="search-input"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          
+          <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className="glass" 
+            style={{ 
+              borderRadius: '1.5rem', 
+              height: '4.5rem', 
+              padding: '0 2rem', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '1rem',
+              border: '1px solid var(--border-color)',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: '600'
+            }}
+          >
+            <Filter size={20} />
+            Filter
+          </button>
+        </div>
+
+        {/* Categories Bar */}
         <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
           {CATEGORIES.map(cat => (
             <button 
               key={cat.name}
               onClick={() => setActiveCategory(cat.name)}
               style={{ 
-                borderRadius: '1rem', 
+                borderRadius: '1.25rem', 
                 padding: '0.8rem 1.5rem',
                 whiteSpace: 'nowrap',
                 background: activeCategory === cat.name ? 'white' : 'transparent',
@@ -212,7 +223,7 @@ const Dashboard = () => {
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.6rem',
+                gap: '0.75rem',
                 transition: 'var(--transition-smooth)'
               }}
             >
@@ -231,7 +242,7 @@ const Dashboard = () => {
         <div className="grid-container grid-2 grid-3 grid-4">
           {filteredItems.map(item => (
             <Link key={item.id} to={`/item/${item.id}`} style={{ textDecoration: 'none' }}>
-              <div className="glass-card" style={{ height: '100%', borderRadius: '1.5rem', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="glass-card" style={{ height: '100%', borderRadius: '1.75rem', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ position: 'relative', width: '100%', paddingTop: '100%' }}>
                   <img src={item.image_url} alt={item.title} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div style={{ 
@@ -239,10 +250,10 @@ const Dashboard = () => {
                     top: '1rem', 
                     left: '1rem', 
                     background: 'rgba(5,5,5,0.6)', 
-                    backdropFilter: 'blur(10px)',
-                    padding: '0.4rem 0.8rem', 
-                    borderRadius: '0.75rem', 
-                    fontSize: '0.65rem', 
+                    backdropFilter: 'blur(12px)',
+                    padding: '0.5rem 1rem', 
+                    borderRadius: '1rem', 
+                    fontSize: '0.7rem', 
                     fontWeight: '800', 
                     textTransform: 'uppercase', 
                     letterSpacing: '0.1em',
@@ -253,17 +264,17 @@ const Dashboard = () => {
                     {item.category}
                   </div>
                 </div>
-                <div style={{ padding: '1.25rem' }}>
-                  <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'white' }}>{item.title}</h3>
+                <div style={{ padding: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.2rem', marginBottom: '1.25rem', color: 'white', lineHeight: '1.4' }}>{item.title}</h3>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                      <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'white' }}>₹{item.price}</span>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <span style={{ fontSize: '1.3rem', fontWeight: '800', color: 'white' }}>₹{item.price}</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                         <MapPin size={12} /> {item.location}
                       </span>
                     </div>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-                      <ArrowRight size={16} color="white" />
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <ArrowRight size={20} color="white" />
                     </div>
                   </div>
                 </div>
@@ -276,21 +287,30 @@ const Dashboard = () => {
       {/* Filter Modal */}
       {showFilters && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="glass-card" style={{ width: '90%', maxWidth: '400px', padding: '2rem', borderRadius: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-              <h3>Sort Listings</h3>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '400px', padding: '2.5rem', borderRadius: '2.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2.5rem' }}>
+              <h2 style={{ fontSize: '1.5rem' }}>Sort Listings</h2>
               <X size={24} onClick={() => setShowFilters(false)} style={{ cursor: 'pointer' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {[
-                { id: 'newest', label: 'Newest First' },
+                { id: 'newest', label: 'Newest Arrivals' },
                 { id: 'price-low', label: 'Price: Low to High' },
                 { id: 'price-high', label: 'Price: High to Low' }
               ].map(opt => (
                 <button 
                   key={opt.id}
                   onClick={() => { setSortBy(opt.id); setShowFilters(false); }}
-                  style={{ padding: '1rem', borderRadius: '1rem', background: sortBy === opt.id ? 'white' : 'transparent', color: sortBy === opt.id ? 'black' : 'white', border: '1px solid var(--border-color)', cursor: 'pointer', fontWeight: '600' }}
+                  style={{ 
+                    padding: '1.25rem', 
+                    borderRadius: '1.25rem', 
+                    background: sortBy === opt.id ? 'white' : 'rgba(255,255,255,0.03)', 
+                    color: sortBy === opt.id ? 'black' : 'white', 
+                    border: sortBy === opt.id ? '1px solid white' : '1px solid var(--border-color)', 
+                    cursor: 'pointer', 
+                    fontWeight: '700',
+                    fontSize: '1rem'
+                  }}
                 >
                   {opt.label}
                 </button>
@@ -306,8 +326,14 @@ const Dashboard = () => {
         
         @keyframes bounce {
           0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
-          40% { transform: translateY(-10px) translateX(-50%); }
-          60% { transform: translateY(-5px) translateX(-50%); }
+          40% { transform: translateY(-12px) translateX(-50%); }
+          60% { transform: translateY(-6px) translateX(-50%); }
+        }
+
+        .search-input:focus {
+          border-color: rgba(139, 92, 246, 0.5) !important;
+          background: rgba(139, 92, 246, 0.05) !important;
+          box-shadow: 0 0 30px rgba(139, 92, 246, 0.1);
         }
         
         div::-webkit-scrollbar { display: none; }
