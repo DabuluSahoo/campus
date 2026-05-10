@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, MapPin, Tag, Loader2, X, TrendingUp, Clock, ArrowRight, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Filter, MapPin, Tag, Loader2, X, TrendingUp, Clock, ArrowRight, ChevronDown, RefreshCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
@@ -19,9 +19,20 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('newest');
+  const filterRef = useRef(null);
 
   useEffect(() => {
     fetchItems();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setShowFilters(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const fetchItems = async () => {
@@ -40,6 +51,12 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const resetFilters = () => {
+    setSearch('');
+    setActiveCategory('All');
+    setSortBy('newest');
   };
 
   const filteredItems = items
@@ -152,7 +169,7 @@ const Dashboard = () => {
         </div>
       </section>
 
-      {/* NEW: Product Controls Section */}
+      {/* Product Controls Section */}
       <div className="controls-bar" style={{ marginBottom: '3rem' }}>
         <div style={{ 
           display: 'flex', 
@@ -184,26 +201,70 @@ const Dashboard = () => {
             />
           </div>
           
-          <button 
-            onClick={() => setShowFilters(!showFilters)}
-            className="glass filter-btn" 
-            style={{ 
-              borderRadius: '1.5rem', 
-              height: '4.5rem', 
-              padding: '0 2rem', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '1rem',
-              border: '1px solid var(--border-color)',
-              color: 'white',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              fontWeight: '600'
-            }}
-          >
-            <Filter size={20} />
-            Filter
-          </button>
+          <div style={{ position: 'relative' }} ref={filterRef}>
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              className="glass filter-btn" 
+              style={{ 
+                borderRadius: '1.5rem', 
+                height: '4.5rem', 
+                padding: '0 2rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '1rem',
+                border: '1px solid var(--border-color)',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                fontWeight: '600'
+              }}
+            >
+              <Filter size={20} />
+              Filter
+            </button>
+
+            {/* Localized Dropdown */}
+            {showFilters && (
+              <div className="glass-card animate-fade-in" style={{ 
+                position: 'absolute', 
+                top: '5.5rem', 
+                right: 0, 
+                width: '300px', 
+                zIndex: 100, 
+                padding: '1.5rem', 
+                borderRadius: '1.5rem',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                <h4 style={{ marginBottom: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>SORT BY</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {[
+                    { id: 'newest', label: 'Newest Arrivals' },
+                    { id: 'price-low', label: 'Price: Low to High' },
+                    { id: 'price-high', label: 'Price: High to Low' }
+                  ].map(opt => (
+                    <button 
+                      key={opt.id}
+                      onClick={() => { setSortBy(opt.id); setShowFilters(false); }}
+                      style={{ 
+                        padding: '1rem', 
+                        borderRadius: '1rem', 
+                        background: sortBy === opt.id ? 'white' : 'transparent', 
+                        color: sortBy === opt.id ? 'black' : 'white', 
+                        border: '1px solid var(--border-color)', 
+                        cursor: 'pointer', 
+                        fontWeight: '700',
+                        fontSize: '0.9rem',
+                        textAlign: 'left'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Categories Bar */}
@@ -237,6 +298,52 @@ const Dashboard = () => {
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '5rem' }}>
           <div className="loader-ring"></div>
+        </div>
+      ) : filteredItems.length === 0 ? (
+        /* Empty State */
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          padding: '8rem 2rem',
+          textAlign: 'center',
+          background: 'rgba(255,255,255,0.02)',
+          borderRadius: '3rem',
+          border: '1px dashed rgba(255,255,255,0.1)'
+        }}>
+          <div style={{ 
+            width: '80px', 
+            height: '80px', 
+            borderRadius: '50%', 
+            background: 'rgba(255,255,255,0.05)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            marginBottom: '2rem'
+          }}>
+            <Search size={32} color="var(--text-secondary)" />
+          </div>
+          <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>No premium deals found</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem', maxWidth: '400px' }}>
+            We couldn't find anything matching your filters. Try a different search or reset your experience.
+          </p>
+          <button 
+            onClick={resetFilters}
+            className="glass"
+            style={{ 
+              padding: '1rem 2.5rem', 
+              borderRadius: '1.25rem', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.75rem',
+              fontWeight: '700',
+              cursor: 'pointer'
+            }}
+          >
+            <RefreshCcw size={18} />
+            Reset Experience
+          </button>
         </div>
       ) : (
         <div className="grid-container grid-2 grid-3 grid-4">
@@ -278,42 +385,6 @@ const Dashboard = () => {
               </div>
             </Link>
           ))}
-        </div>
-      )}
-
-      {/* Filter Modal */}
-      {showFilters && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="glass-card" style={{ width: '90%', maxWidth: '400px', padding: '2.5rem', borderRadius: '2.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2.5rem' }}>
-              <h2 style={{ fontSize: '1.5rem' }}>Sort Listings</h2>
-              <X size={24} onClick={() => setShowFilters(false)} style={{ cursor: 'pointer' }} />
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {[
-                { id: 'newest', label: 'Newest Arrivals' },
-                { id: 'price-low', label: 'Price: Low to High' },
-                { id: 'price-high', label: 'Price: High to Low' }
-              ].map(opt => (
-                <button 
-                  key={opt.id}
-                  onClick={() => { setSortBy(opt.id); setShowFilters(false); }}
-                  style={{ 
-                    padding: '1.25rem', 
-                    borderRadius: '1.25rem', 
-                    background: sortBy === opt.id ? 'white' : 'rgba(255,255,255,0.03)', 
-                    color: sortBy === opt.id ? 'black' : 'white', 
-                    border: sortBy === opt.id ? '1px solid white' : '1px solid var(--border-color)', 
-                    cursor: 'pointer', 
-                    fontWeight: '700',
-                    fontSize: '1rem'
-                  }}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       )}
 
