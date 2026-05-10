@@ -143,9 +143,20 @@ const App = () => {
         .desktop-nav { display: flex; }
         .mobile-nav { display: none; }
         
+        @media (min-width: 769px) {
+          .mobile-nav { display: none !important; }
+          .desktop-nav { display: flex !important; }
+        }
+
         @media (max-width: 768px) {
-          .desktop-nav { display: none; }
-          .mobile-nav { display: flex; }
+          .desktop-nav { display: none !important; }
+          .mobile-nav { display: flex !important; }
+          
+          /* Adjust main container padding for mobile */
+          .app-container { 
+            padding-top: 2rem !important; 
+            padding-bottom: 7rem !important; 
+          }
         }
         
         .nav-link {
@@ -153,8 +164,11 @@ const App = () => {
           padding: 0.75rem;
           border-radius: 1rem;
           transition: all 0.3s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
-        .nav-link:hover, .nav-link:active {
+        .nav-link:hover, .nav-link.active {
           color: white;
           background: rgba(255,255,255,0.05);
         }
@@ -170,15 +184,16 @@ const App = () => {
 
   return (
     <Router>
-      <div style={{ 
+      <div className="app-container" style={{ 
         minHeight: '100vh',
-        paddingTop: session ? '7rem' : '0',
-        paddingBottom: session ? '8rem' : '0',
+        paddingTop: session ? '7.5rem' : '0',
+        paddingBottom: '2rem',
         maxWidth: '1300px', 
-        margin: '0 auto' 
+        margin: '0 auto',
+        transition: 'all 0.3s'
       }}>
         {session && <Navbar />}
-        <main style={{ padding: '0 1rem' }}>
+        <main>
           <Routes>
             <Route path="/login" element={session ? <Navigate to="/dashboard" /> : <Login />} />
             <Route path="/dashboard" element={session ? <Dashboard /> : <Login />} />
