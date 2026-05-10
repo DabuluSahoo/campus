@@ -91,7 +91,7 @@ const Dashboard = () => {
           }}></div>
         </div>
 
-        <div style={{ zIndex: 1, padding: '4rem', maxWidth: '750px' }}>
+        <div className="hero-content" style={{ zIndex: 1, padding: '4rem', maxWidth: '750px' }}>
           <div style={{ 
             display: 'inline-flex', 
             alignItems: 'center', 
@@ -109,7 +109,7 @@ const Dashboard = () => {
             <TrendingUp size={16} /> TRENDING ON CAMPUS
           </div>
 
-          <h1 style={{ 
+          <h1 className="hero-title" style={{ 
             fontSize: '5rem', 
             fontWeight: '900', 
             lineHeight: '0.95', 
@@ -121,7 +121,7 @@ const Dashboard = () => {
             <span style={{ color: 'rgba(255,255,255,0.4)' }}>LIVE SMARTER.</span>
           </h1>
 
-          <p style={{ 
+          <p className="hero-desc" style={{ 
             fontSize: '1.25rem', 
             color: 'var(--text-secondary)', 
             marginBottom: '2rem', 
@@ -153,7 +153,7 @@ const Dashboard = () => {
       </section>
 
       {/* NEW: Product Controls Section */}
-      <div style={{ marginBottom: '3rem' }}>
+      <div className="controls-bar" style={{ marginBottom: '3rem' }}>
         <div style={{ 
           display: 'flex', 
           gap: '1.5rem', 
@@ -162,7 +162,7 @@ const Dashboard = () => {
           marginBottom: '2.5rem',
           flexWrap: 'wrap'
         }}>
-          <div style={{ position: 'relative', flex: 1, maxWidth: '600px' }}>
+          <div className="search-container" style={{ position: 'relative', flex: 1, minWidth: '300px' }}>
             <Search size={20} style={{ position: 'absolute', left: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
             <input 
               type="text" 
@@ -186,7 +186,7 @@ const Dashboard = () => {
           
           <button 
             onClick={() => setShowFilters(!showFilters)}
-            className="glass" 
+            className="glass filter-btn" 
             style={{ 
               borderRadius: '1.5rem', 
               height: '4.5rem', 
@@ -325,6 +325,14 @@ const Dashboard = () => {
           0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
           40% { transform: translateY(-12px) translateX(-50%); }
           60% { transform: translateY(-6px) translateX(-50%); }
+        }
+
+        @media (max-width: 768px) {
+          .hero-content { padding: 2.5rem 1.5rem !important; }
+          .hero-title { fontSize: 3rem !important; }
+          .hero-desc { fontSize: 1rem !important; }
+          .search-container { min-width: 100% !important; }
+          .filter-btn { width: 100% !important; justify-content: center !important; height: 3.5rem !important; }
         }
 
         .search-input:focus {

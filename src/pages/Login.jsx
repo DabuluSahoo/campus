@@ -76,8 +76,8 @@ const Login = () => {
       <div className="login-float" style={{ position: 'absolute', top: '20%', left: '10%', opacity: 0.3 }}><Sparkles size={100} color="var(--primary-color)" /></div>
       <div className="login-float-delayed" style={{ position: 'absolute', bottom: '15%', right: '12%', opacity: 0.2 }}><Rocket size={120} color="var(--secondary-color)" /></div>
 
-      <div className="animate-fade-in" style={{ zIndex: 1, width: '100%', maxWidth: '480px', padding: '20px' }}>
-        <div className="glass-card" style={{ 
+      <div className="login-container animate-fade-in" style={{ zIndex: 1, width: '100%', maxWidth: '480px', padding: '20px' }}>
+        <div className="glass-card login-card" style={{ 
           padding: '3.5rem', 
           borderRadius: '2.5rem', 
           textAlign: 'center',
@@ -159,6 +159,12 @@ const Login = () => {
         
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .animate-spin { animation: spin 1s linear infinite; }
+
+        @media (max-width: 600px) {
+          .login-card { padding: 2rem 1.5rem !important; borderRadius: 2rem !important; }
+          h1 { fontSize: 2rem !important; }
+          p { fontSize: 0.95rem !important; }
+        }
       `}} />
     </div>
   );
