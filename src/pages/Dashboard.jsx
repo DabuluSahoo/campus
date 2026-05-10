@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, MapPin, Tag, Loader2, X, ArrowUpDown, Sparkles, TrendingUp, Zap, Clock } from 'lucide-react';
+import { Search, Filter, MapPin, Tag, Loader2, X, TrendingUp, Clock, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
 const CATEGORIES = [
-  { name: 'All', icon: <Sparkles size={18} /> },
-  { name: 'Books', icon: <Zap size={18} /> },
-  { name: 'Electronics', icon: <Zap size={18} /> },
-  { name: 'Furniture', icon: <Zap size={18} /> },
-  { name: 'Appliances', icon: <Zap size={18} /> },
-  { name: 'Clothing', icon: <Zap size={18} /> }
+  { name: 'All', icon: <TrendingUp size={18} /> },
+  { name: 'Books', icon: <Tag size={18} /> },
+  { name: 'Electronics', icon: <Tag size={18} /> },
+  { name: 'Furniture', icon: <Tag size={18} /> },
+  { name: 'Appliances', icon: <Tag size={18} /> },
+  { name: 'Clothing', icon: <Tag size={18} /> }
 ];
 
 const Dashboard = () => {
@@ -56,30 +56,31 @@ const Dashboard = () => {
     });
 
   return (
-    <div className="animate-fade-in">
-      {/* Dynamic Hero Section */}
+    <div className="animate-fade-in" style={{ padding: '0 1rem' }}>
+      {/* Clean Hero Section */}
       <section style={{ 
         position: 'relative', 
-        borderRadius: '3rem', 
+        borderRadius: '2.5rem', 
         overflow: 'hidden', 
         marginBottom: '4rem',
-        minHeight: '450px',
+        minHeight: '500px',
         display: 'flex',
         alignItems: 'center',
-        padding: '4rem'
+        background: '#050505'
       }}>
+        {/* Background Image with Clean Mask */}
         <div style={{
           position: 'absolute',
           top: 0,
-          left: 0,
-          width: '100%',
+          right: 0,
+          width: '60%',
           height: '100%',
           zIndex: 0
         }}>
           <img 
             src="/dashboard_hero_elite.png" 
-            alt="Hero" 
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            alt="" 
+            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} 
           />
           <div style={{
             position: 'absolute',
@@ -87,38 +88,67 @@ const Dashboard = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            background: 'linear-gradient(90deg, rgba(5,5,5,0.9) 0%, rgba(5,5,5,0.4) 60%, transparent 100%)'
+            background: 'linear-gradient(90deg, #050505 0%, rgba(5,5,5,0.8) 30%, transparent 100%)'
           }}></div>
         </div>
 
-        <div style={{ zIndex: 1, maxWidth: '600px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--primary-color)', marginBottom: '1.5rem', fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
-            <TrendingUp size={20} /> Trending on Campus
+        {/* Content Area */}
+        <div style={{ zIndex: 1, padding: '4rem', maxWidth: '700px' }}>
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '0.5rem', 
+            background: 'rgba(139, 92, 246, 0.1)', 
+            padding: '0.5rem 1rem', 
+            borderRadius: '1rem', 
+            color: '#8b5cf6', 
+            marginBottom: '2rem', 
+            fontSize: '0.8rem', 
+            fontWeight: '700', 
+            letterSpacing: '0.1em',
+            border: '1px solid rgba(139, 92, 246, 0.2)'
+          }}>
+            <TrendingUp size={16} /> TRENDING ON CAMPUS
           </div>
-          <h1 style={{ fontSize: '4.5rem', fontWeight: '900', lineHeight: '0.9', marginBottom: '1.5rem', letterSpacing: '-0.05em' }}>
-            TRADE <span style={{ color: 'var(--primary-color)' }}>SMARTER</span><br />
-            LIVE BETTER.
+
+          <h1 style={{ 
+            fontSize: '4.5rem', 
+            fontWeight: '900', 
+            lineHeight: '1', 
+            marginBottom: '1.5rem', 
+            letterSpacing: '-0.04em',
+            color: 'white'
+          }}>
+            Trade Better.<br />
+            <span style={{ color: 'rgba(255,255,255,0.4)' }}>Live Smarter.</span>
           </h1>
-          <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', marginBottom: '2.5rem', maxWidth: '450px' }}>
-            Unlock exclusive student deals and turn your clutter into cash with the next-gen marketplace.
+
+          <p style={{ 
+            fontSize: '1.2rem', 
+            color: 'var(--text-secondary)', 
+            marginBottom: '3rem', 
+            maxWidth: '500px',
+            lineHeight: '1.6'
+          }}>
+            The ultra-clean marketplace for university students. 
+            Discover premium deals in your campus today.
           </p>
           
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', flex: 1, minWidth: '300px' }}>
-              <Search size={24} style={{ position: 'absolute', left: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ position: 'relative', width: '400px' }}>
+              <Search size={20} style={{ position: 'absolute', left: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
               <input 
                 type="text" 
-                className="glass" 
-                placeholder="Search premium listings..."
+                placeholder="Search listings..."
                 style={{ 
                   width: '100%', 
-                  padding: '1.25rem 1.25rem 1.25rem 4rem',
-                  borderRadius: '1.5rem',
+                  padding: '1.25rem 1.25rem 1.25rem 3.5rem',
+                  borderRadius: '1.25rem',
                   border: '1px solid rgba(255,255,255,0.1)',
                   color: 'white',
-                  fontSize: '1.1rem',
+                  fontSize: '1rem',
                   background: 'rgba(255,255,255,0.05)',
-                  backdropFilter: 'blur(20px)'
+                  outline: 'none'
                 }}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -126,41 +156,46 @@ const Dashboard = () => {
             </div>
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              className="btn btn-secondary" 
-              style={{ borderRadius: '1.5rem', height: '4rem', padding: '0 2rem', fontSize: '1rem' }}
+              className="glass" 
+              style={{ 
+                borderRadius: '1.25rem', 
+                height: '3.75rem', 
+                padding: '0 1.5rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.75rem',
+                border: '1px solid var(--border-color)',
+                color: 'white',
+                cursor: 'pointer'
+              }}
             >
-              <Filter size={20} />
-              Filters
+              <Filter size={18} />
+              Filter
             </button>
           </div>
         </div>
       </section>
 
-      {/* Modern Categories */}
-      <div style={{ marginBottom: '3rem' }}>
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Tag size={24} color="var(--primary-color)" /> Browse Categories
-        </h2>
+      {/* Categories */}
+      <div style={{ marginBottom: '3.5rem' }}>
         <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
           {CATEGORIES.map(cat => (
             <button 
               key={cat.name}
               onClick={() => setActiveCategory(cat.name)}
-              className="glass-card"
               style={{ 
-                borderRadius: '1.25rem', 
-                padding: '1rem 2rem',
+                borderRadius: '1rem', 
+                padding: '0.8rem 1.5rem',
                 whiteSpace: 'nowrap',
-                background: activeCategory === cat.name ? 'var(--primary-color)' : 'rgba(255,255,255,0.03)',
-                border: activeCategory === cat.name ? '1px solid var(--primary-color)' : '1px solid var(--border-color)',
-                color: 'white',
+                background: activeCategory === cat.name ? 'white' : 'transparent',
+                border: activeCategory === cat.name ? '1px solid white' : '1px solid var(--border-color)',
+                color: activeCategory === cat.name ? 'black' : 'white',
                 fontWeight: '600',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.75rem',
-                transform: activeCategory === cat.name ? 'translateY(-5px)' : 'none',
-                boxShadow: activeCategory === cat.name ? '0 10px 20px var(--primary-glow)' : 'none'
+                gap: '0.6rem',
+                transition: 'var(--transition-smooth)'
               }}
             >
               {cat.icon}
@@ -178,38 +213,31 @@ const Dashboard = () => {
         <div className="grid-container grid-2 grid-3 grid-4">
           {filteredItems.map(item => (
             <Link key={item.id} to={`/item/${item.id}`} style={{ textDecoration: 'none' }}>
-              <div className="glass-card" style={{ height: '100%', borderRadius: '1.75rem', overflow: 'hidden' }}>
-                <div style={{ position: 'relative', width: '100%', paddingTop: '110%' }}>
+              <div className="glass-card" style={{ height: '100%', borderRadius: '1.5rem', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ position: 'relative', width: '100%', paddingTop: '100%' }}>
                   <img src={item.image_url} alt={item.title} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div style={{ 
                     position: 'absolute', 
-                    bottom: '1rem', 
+                    top: '1rem', 
                     right: '1rem', 
-                    background: 'rgba(5,5,5,0.8)', 
-                    backdropFilter: 'blur(12px)', 
-                    padding: '0.6rem 1.2rem', 
-                    borderRadius: '1.25rem', 
+                    background: 'rgba(255,255,255,0.9)', 
+                    padding: '0.4rem 0.8rem', 
+                    borderRadius: '0.75rem', 
                     fontWeight: '800', 
-                    color: 'white', 
-                    fontSize: '1.2rem',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
+                    color: 'black', 
+                    fontSize: '0.9rem'
                   }}>
                     ₹{item.price}
                   </div>
-                  <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'rgba(124, 58, 237, 0.8)', padding: '0.4rem 0.8rem', borderRadius: '0.75rem', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {item.category}
-                  </div>
                 </div>
-                <div style={{ padding: '1.5rem' }}>
-                  <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', lineHeight: '1.3' }}>{item.title}</h3>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <MapPin size={14} color="var(--primary-color)" /> {item.location}
-                    </span>
+                <div style={{ padding: '1.25rem' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--primary-color)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{item.category}</div>
+                  <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'white' }}>{item.title}</h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                      <Clock size={14} /> 2d ago
+                      <MapPin size={14} /> {item.location}
                     </span>
+                    <ArrowRight size={16} color="var(--text-secondary)" />
                   </div>
                 </div>
               </div>
@@ -218,50 +246,25 @@ const Dashboard = () => {
         </div>
       )}
 
-      {!loading && filteredItems.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '8rem 0' }}>
-          <div className="glass-card" style={{ display: 'inline-block', padding: '3rem', borderRadius: '2.5rem' }}>
-            <Tag size={60} style={{ marginBottom: '1.5rem', opacity: 0.1, color: 'var(--primary-color)' }} />
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>No premium items found</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>Try adjusting your filters or search terms.</p>
-            <button onClick={() => { setActiveCategory('All'); setSearch(''); }} className="btn btn-primary" style={{ marginTop: '2rem' }}>Reset Experience</button>
-          </div>
-        </div>
-      )}
-
-      {/* Sorting Modal (Redesigned) */}
+      {/* Filter Modal */}
       {showFilters && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="glass-card animate-fade-in" style={{ width: '100%', maxWidth: '400px', padding: '2.5rem', borderRadius: '2.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h2 style={{ fontSize: '1.5rem' }}>Smart Filters</h2>
-              <X size={24} style={{ cursor: 'pointer' }} onClick={() => setShowFilters(false)} />
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="glass-card" style={{ width: '90%', maxWidth: '400px', padding: '2rem', borderRadius: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
+              <h3>Sort Listings</h3>
+              <X size={24} onClick={() => setShowFilters(false)} style={{ cursor: 'pointer' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {[
-                { id: 'newest', label: 'Newest Arrivals', icon: <Clock size={20} /> },
-                { id: 'price-low', label: 'Price: Low to High', icon: <TrendingUp size={20} /> },
-                { id: 'price-high', label: 'Price: High to Low', icon: <TrendingUp size={20} style={{ transform: 'rotate(180deg)' }} /> }
+                { id: 'newest', label: 'Newest First' },
+                { id: 'price-low', label: 'Price: Low to High' },
+                { id: 'price-high', label: 'Price: High to Low' }
               ].map(opt => (
                 <button 
                   key={opt.id}
                   onClick={() => { setSortBy(opt.id); setShowFilters(false); }}
-                  className="glass"
-                  style={{ 
-                    padding: '1.25rem', 
-                    borderRadius: '1.25rem', 
-                    border: sortBy === opt.id ? '2px solid var(--primary-color)' : '1px solid var(--border-color)',
-                    background: sortBy === opt.id ? 'rgba(124, 58, 237, 0.1)' : 'transparent',
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    cursor: 'pointer',
-                    fontWeight: '600',
-                    transition: 'var(--transition-smooth)'
-                  }}
+                  style={{ padding: '1rem', borderRadius: '1rem', background: sortBy === opt.id ? 'white' : 'transparent', color: sortBy === opt.id ? 'black' : 'white', border: '1px solid var(--border-color)', cursor: 'pointer', fontWeight: '600' }}
                 >
-                  {opt.icon}
                   {opt.label}
                 </button>
               ))}
@@ -271,17 +274,8 @@ const Dashboard = () => {
       )}
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .loader-ring {
-          width: 60px;
-          height: 60px;
-          border: 4px solid rgba(124, 58, 237, 0.1);
-          border-top: 4px solid var(--primary-color);
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* Category Scrollbar Hide */
+        .loader-ring { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         div::-webkit-scrollbar { display: none; }
       `}} />
     </div>

@@ -2,19 +2,19 @@
 
 :root {
   --bg-color: #050505;
-  --surface-color: rgba(15, 15, 18, 0.7);
-  --primary-color: #7c3aed; /* Vibrant Violet */
-  --primary-glow: rgba(124, 58, 237, 0.4);
-  --secondary-color: #2563eb; /* Royal Blue */
+  --surface-color: rgba(10, 10, 12, 0.8);
+  --primary-color: #8b5cf6; /* Clean Violet */
+  --primary-glow: rgba(139, 92, 246, 0.2);
+  --secondary-color: #3b82f6; /* Modern Blue */
   --tertiary-color: #10b981;
-  --accent-color: #f472b6; /* Hot Pink for accents */
+  --accent-color: #f472b6;
   --text-primary: #ffffff;
-  --text-secondary: #94a3b8;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-blur: 16px;
+  --text-secondary: #a1a1aa;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.02);
+  --glass-blur: 20px;
   --font-inter: 'Inter', sans-serif;
-  --transition-smooth: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
