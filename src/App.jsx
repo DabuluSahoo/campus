@@ -93,31 +93,39 @@ const App = () => {
           <Logo size={36} />
         </Link>
 
-        {/* Desktop Links */}
-        <div className="desktop-links" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <Link to="/dashboard" className="nav-link"><LayoutDashboard size={20} /></Link>
-          <Link to="/post" className="nav-link"><PlusSquare size={20} /></Link>
-          <Link to="/chat" className="nav-link"><MessageSquare size={20} /></Link>
-          <Link to="/profile" className="nav-link">
+        {/* Right Side Controls */}
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          {/* Desktop Only Links */}
+          <div className="desktop-links" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <Link to="/dashboard" className="nav-link"><LayoutDashboard size={20} /></Link>
+            <Link to="/post" className="nav-link"><PlusSquare size={20} /></Link>
+            <Link to="/chat" className="nav-link"><MessageSquare size={20} /></Link>
+          </div>
+
+          {/* Quick Access Mobile + Desktop */}
+          <Link to="/post" className="nav-link mobile-only-link"><PlusSquare size={22} /></Link>
+          <Link to="/profile" className="nav-link" style={{ padding: '0.5rem' }}>
             {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="P" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
-            ) : <User size={20} />}
+              <img src={profile.avatar_url} alt="P" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
+            ) : <User size={22} />}
           </Link>
-          <button onClick={handleLogout} className="nav-link logout-btn" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+
+          {/* Hamburger Icon */}
+          <button className="mobile-menu-btn" onClick={toggleMenu} style={{ 
+            background: 'none', 
+            border: 'none', 
+            color: 'white', 
+            cursor: 'pointer',
+            padding: '0.5rem'
+          }}>
+            {isMenuOpen ? <X size={26} /> : <Menu size={26} />}
+          </button>
+
+          {/* Desktop Only Logout */}
+          <button onClick={handleLogout} className="nav-link desktop-links logout-btn" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
             <LogOut size={20} />
           </button>
         </div>
-
-        {/* Mobile Hamburger Icon */}
-        <button className="mobile-menu-btn" onClick={toggleMenu} style={{ 
-          background: 'none', 
-          border: 'none', 
-          color: 'white', 
-          cursor: 'pointer',
-          padding: '0.5rem'
-        }}>
-          {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
       </nav>
 
       {/* Mobile Fullscreen Menu */}
@@ -194,11 +202,13 @@ const App = () => {
 
       <style dangerouslySetInnerHTML={{ __html: `
         .mobile-menu-btn { display: none; }
+        .mobile-only-link { display: none; }
         .desktop-links { display: flex; }
         
         @media (max-width: 768px) {
-          .desktop-links { display: none; }
-          .mobile-menu-btn { display: block; }
+          .desktop-links { display: none !important; }
+          .mobile-menu-btn { display: block !important; }
+          .mobile-only-link { display: flex !important; }
           .app-container { padding-top: 6.5rem !important; }
         }
         
