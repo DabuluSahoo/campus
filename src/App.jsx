@@ -6,7 +6,10 @@ import {
   MessageSquare, 
   User, 
   LogOut,
-  Loader2
+  Loader2,
+  Menu,
+  X,
+  ChevronRight
 } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
@@ -23,6 +26,7 @@ const App = () => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -65,29 +69,32 @@ const App = () => {
     await supabase.auth.signOut();
   };
 
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
   const Navbar = () => (
     <>
-      {/* Desktop Top Nav */}
-      <nav className="desktop-nav glass" style={{
+      <nav className="global-nav glass" style={{
         position: 'fixed',
-        top: '1.5rem',
+        top: '1rem',
         left: '50%',
         transform: 'translateX(-50%)',
-        width: '90%',
+        width: '95%',
         maxWidth: '1200px',
         height: '4.5rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 2rem',
-        zIndex: 1000,
-        borderRadius: '1.5rem'
+        padding: '0 1.5rem',
+        zIndex: 2000,
+        borderRadius: '1.25rem',
+        border: '1px solid rgba(255,255,255,0.08)'
       }}>
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <Logo size={40} />
+        <Link to="/" style={{ textDecoration: 'none' }} onClick={() => setIsMenuOpen(false)}>
+          <Logo size={36} />
         </Link>
 
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        {/* Desktop Links */}
+        <div className="desktop-links" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <Link to="/dashboard" className="nav-link"><LayoutDashboard size={20} /></Link>
           <Link to="/post" className="nav-link"><PlusSquare size={20} /></Link>
           <Link to="/chat" className="nav-link"><MessageSquare size={20} /></Link>
@@ -96,67 +103,103 @@ const App = () => {
               <img src={profile.avatar_url} alt="P" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
             ) : <User size={20} />}
           </Link>
-          <button onClick={handleLogout} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+          <button onClick={handleLogout} className="nav-link logout-btn" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
             <LogOut size={20} />
           </button>
         </div>
+
+        {/* Mobile Hamburger Icon */}
+        <button className="mobile-menu-btn" onClick={toggleMenu} style={{ 
+          background: 'none', 
+          border: 'none', 
+          color: 'white', 
+          cursor: 'pointer',
+          padding: '0.5rem'
+        }}>
+          {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
       </nav>
 
-      {/* Mobile Bottom Nav */}
-      <nav className="mobile-nav glass" style={{
+      {/* Mobile Fullscreen Menu */}
+      <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`} style={{
         position: 'fixed',
-        bottom: '1.5rem',
-        left: '1rem',
-        right: '1rem',
-        height: '4.5rem',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100vh',
+        background: 'rgba(5,5,5,0.95)',
+        backdropFilter: 'blur(20px)',
+        zIndex: 1500,
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        zIndex: 1000,
-        borderRadius: '1.5rem',
-        padding: '0 1rem'
+        flexDirection: 'column',
+        padding: '8rem 2rem 2rem',
+        transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+        opacity: isMenuOpen ? 1 : 0,
+        visibility: isMenuOpen ? 'visible' : 'hidden',
+        transform: isMenuOpen ? 'translateY(0)' : 'translateY(-20px)'
       }}>
-        <Link to="/dashboard" className="nav-link"><LayoutDashboard size={24} /></Link>
-        <Link to="/post" className="nav-link"><PlusSquare size={24} /></Link>
-        <div style={{ transform: 'translateY(-1.5rem)' }}>
-           <Link to="/" style={{ textDecoration: 'none' }}>
-            <div style={{ 
-              background: 'var(--primary-color)', 
-              padding: '1rem', 
-              borderRadius: '50%', 
-              boxShadow: '0 10px 25px var(--primary-glow)',
-              border: '4px solid #050505'
-            }}>
-              <Logo size={32} showText={false} />
-            </div>
-          </Link>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {[
+            { to: '/dashboard', label: 'Marketplace', icon: <LayoutDashboard size={24} /> },
+            { to: '/post', label: 'Post Listing', icon: <PlusSquare size={24} /> },
+            { to: '/chat', label: 'Messages', icon: <MessageSquare size={24} /> },
+            { to: '/profile', label: 'Profile', icon: <User size={24} /> }
+          ].map(link => (
+            <Link 
+              key={link.to} 
+              to={link.to} 
+              onClick={() => setIsMenuOpen(false)}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                padding: '1.5rem',
+                borderRadius: '1.5rem',
+                background: 'rgba(255,255,255,0.03)',
+                textDecoration: 'none',
+                color: 'white',
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                border: '1px solid rgba(255,255,255,0.05)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span style={{ color: 'var(--primary-color)' }}>{link.icon}</span>
+                {link.label}
+              </div>
+              <ChevronRight size={20} color="var(--text-secondary)" />
+            </Link>
+          ))}
+          <button 
+            onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+            style={{ 
+              marginTop: '2rem',
+              padding: '1.5rem',
+              borderRadius: '1.5rem',
+              background: 'rgba(239, 68, 68, 0.1)',
+              color: '#ef4444',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              fontSize: '1.25rem',
+              fontWeight: '700',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '1rem'
+            }}
+          >
+            <LogOut size={24} /> Logout Account
+          </button>
         </div>
-        <Link to="/chat" className="nav-link"><MessageSquare size={24} /></Link>
-        <Link to="/profile" className="nav-link">
-          {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt="P" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
-          ) : <User size={24} />}
-        </Link>
-      </nav>
+      </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .desktop-nav { display: flex; }
-        .mobile-nav { display: none; }
+        .mobile-menu-btn { display: none; }
+        .desktop-links { display: flex; }
         
-        @media (min-width: 769px) {
-          .mobile-nav { display: none !important; }
-          .desktop-nav { display: flex !important; }
-        }
-
         @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .mobile-nav { display: flex !important; }
-          
-          /* Adjust main container padding for mobile */
-          .app-container { 
-            padding-top: 2rem !important; 
-            padding-bottom: 7rem !important; 
-          }
+          .desktop-links { display: none; }
+          .mobile-menu-btn { display: block; }
+          .app-container { padding-top: 6.5rem !important; }
         }
         
         .nav-link {
@@ -168,9 +211,13 @@ const App = () => {
           align-items: center;
           justify-content: center;
         }
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover {
           color: white;
           background: rgba(255,255,255,0.05);
+        }
+        .logout-btn:hover {
+          color: #ef4444;
+          background: rgba(239, 68, 68, 0.1);
         }
       `}} />
     </>
@@ -186,14 +233,14 @@ const App = () => {
     <Router>
       <div className="app-container" style={{ 
         minHeight: '100vh',
-        paddingTop: session ? '7.5rem' : '0',
+        paddingTop: session ? '7rem' : '0',
         paddingBottom: '2rem',
         maxWidth: '1300px', 
         margin: '0 auto',
         transition: 'all 0.3s'
       }}>
         {session && <Navbar />}
-        <main>
+        <main style={{ padding: '0 1rem' }}>
           <Routes>
             <Route path="/login" element={session ? <Navigate to="/dashboard" /> : <Login />} />
             <Route path="/dashboard" element={session ? <Dashboard /> : <Login />} />

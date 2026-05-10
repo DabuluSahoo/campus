@@ -306,42 +306,51 @@ const Dashboard = () => {
           flexDirection: 'column', 
           alignItems: 'center', 
           justifyContent: 'center', 
-          padding: '8rem 2rem',
+          padding: '6rem 2rem',
           textAlign: 'center',
           background: 'rgba(255,255,255,0.02)',
-          borderRadius: '3rem',
-          border: '1px dashed rgba(255,255,255,0.1)'
+          borderRadius: '2.5rem',
+          border: '1px solid rgba(255,255,255,0.05)',
+          boxShadow: 'inset 0 0 50px rgba(0,0,0,0.5)'
         }}>
           <div style={{ 
-            width: '80px', 
-            height: '80px', 
+            width: '100px', 
+            height: '100px', 
             borderRadius: '50%', 
-            background: 'rgba(255,255,255,0.05)', 
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1))', 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
-            marginBottom: '2rem'
+            marginBottom: '2rem',
+            border: '1px solid rgba(139, 92, 246, 0.2)'
           }}>
-            <Search size={32} color="var(--text-secondary)" />
+            <Search size={40} color="#8b5cf6" />
           </div>
-          <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>No premium deals found</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem', maxWidth: '400px' }}>
+          <h2 style={{ fontSize: '2.2rem', marginBottom: '1rem', fontWeight: '900' }}>No premium deals found</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '3rem', maxWidth: '400px', fontSize: '1.1rem', lineHeight: '1.6' }}>
             We couldn't find anything matching your filters. Try a different search or reset your experience.
           </p>
           <button 
             onClick={resetFilters}
-            className="glass"
             style={{ 
-              padding: '1rem 2.5rem', 
-              borderRadius: '1.25rem', 
+              padding: '1.25rem 3rem', 
+              borderRadius: '1.5rem', 
               display: 'flex', 
               alignItems: 'center', 
-              gap: '0.75rem',
-              fontWeight: '700',
-              cursor: 'pointer'
+              gap: '1rem',
+              fontWeight: '800',
+              cursor: 'pointer',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+              color: 'white',
+              border: 'none',
+              boxShadow: '0 15px 35px rgba(139, 92, 246, 0.3)',
+              fontSize: '1rem',
+              transition: 'transform 0.3s'
             }}
+            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
-            <RefreshCcw size={18} />
+            <RefreshCcw size={20} />
             Reset Experience
           </button>
         </div>
@@ -399,9 +408,9 @@ const Dashboard = () => {
         }
 
         @media (max-width: 768px) {
-          .hero-content { padding: 2.5rem 1.5rem !important; }
-          .hero-title { fontSize: 3rem !important; }
-          .hero-desc { fontSize: 1rem !important; }
+          .hero-content { padding: 3rem 1.5rem !important; }
+          .hero-title { font-size: 2.75rem !important; }
+          .hero-desc { font-size: 1rem !important; margin-bottom: 3rem !important; }
           .search-container { min-width: 100% !important; }
           .filter-btn { width: 100% !important; justify-content: center !important; height: 3.5rem !important; }
         }
