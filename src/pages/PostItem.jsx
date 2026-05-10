@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, MapPin, DollarSign, Loader2 } from 'lucide-react';
+import { Upload, MapPin, DollarSign, Loader2, X, Plus } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,16 +10,28 @@ const PostItem = () => {
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [location, setLocation] = useState('');
-  const [imagePreview, setImagePreview] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
+  
+  // Multiple images state
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setImagePreview(URL.createObjectURL(file));
+  const handleImagesUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      const newFiles = [...selectedFiles, ...files].slice(0, 5); // Limit to 5 images
+      setSelectedFiles(newFiles);
+      
+      const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+      setImagePreviews(newPreviews);
     }
+  };
+
+  const removeImage = (index) => {
+    const newFiles = selectedFiles.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    setSelectedFiles(newFiles);
+    setImagePreviews(newPreviews);
   };
 
   const handleSubmit = async (e) => {
@@ -27,31 +39,35 @@ const PostItem = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     
+    if (selectedFiles.length === 0) {
+      alert("Please upload at least one image");
+      return;
+    }
+
     setLoading(true);
     try {
-      let finalImageUrl = 'https://images.unsplash.com/photo-1544947950-fa07a98d237f';
+      const uploadedUrls = [];
 
-      // 1. Upload Image to Supabase Storage
-      if (selectedFile) {
-        const fileExt = selectedFile.name.split('.').pop();
+      // 1. Upload all images to Supabase Storage
+      for (const file of selectedFiles) {
+        const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const filePath = `${user.id}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('item-images')
-          .upload(filePath, selectedFile);
+          .upload(filePath, file);
 
         if (uploadError) throw uploadError;
 
-        // 2. Get Public URL
         const { data: { publicUrl } } = supabase.storage
           .from('item-images')
           .getPublicUrl(filePath);
         
-        finalImageUrl = publicUrl;
+        uploadedUrls.push(publicUrl);
       }
 
-      // 3. Save to Database
+      // 2. Save to Database
       const { error: dbError } = await supabase
         .from('items')
         .insert([
@@ -63,7 +79,8 @@ const PostItem = () => {
             location,
             seller_id: user.id,
             seller_email: user.email,
-            image_url: finalImageUrl,
+            image_url: uploadedUrls[0], // Main wallpaper image
+            image_urls: uploadedUrls,    // All images as array
             status: 'active'
           }
         ]);
@@ -79,50 +96,69 @@ const PostItem = () => {
   };
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto' }}>
+    <div className="animate-fade-in" style={{ maxWidth: '850px', margin: '0 auto' }}>
       <header style={{ marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: '800' }}>List an Item</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>Complete the details below to reach thousands of students.</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Upload up to 5 photos to make your listing stand out.</p>
       </header>
 
-      <div className="post-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem' }}>
+      <div className="post-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '3rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="input-group">
-            <label className="input-label">Item Image</label>
+            <label className="input-label">Item Images (First image is wallpaper)</label>
+            
+            {/* Main Preview */}
             <div 
               className="glass" 
               style={{ 
-                height: '350px', 
+                height: '380px', 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center', 
                 position: 'relative',
                 overflow: 'hidden',
-                cursor: 'pointer',
                 borderRadius: '2rem',
-                border: '2px dashed rgba(255,255,255,0.1)'
+                border: '2px dashed rgba(255,255,255,0.1)',
+                marginBottom: '1rem'
               }}
-              onClick={() => document.getElementById('imageInput').click()}
             >
-              {imagePreview ? (
-                <img src={imagePreview} alt="Upload" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {imagePreviews.length > 0 ? (
+                <img src={imagePreviews[0]} alt="Upload" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-                  <Upload size={40} style={{ marginBottom: '1rem' }} />
-                  <p>Click to upload image</p>
+                <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }} onClick={() => document.getElementById('imageInput').click()}>
+                  <Upload size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                  <p>Click to upload main photo</p>
                 </div>
               )}
-              <input 
-                id="imageInput" 
-                type="file" 
-                hidden 
-                accept="image/*" 
-                onChange={handleImageUpload}
-              />
             </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '1rem', textAlign: 'center' }}>
-              Upload a clear photo to attract more buyers.
-            </p>
+
+            {/* Thumbnail Gallery Preview */}
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              {imagePreviews.map((preview, index) => (
+                <div key={index} style={{ position: 'relative', width: '70px', height: '70px', borderRadius: '1rem', overflow: 'hidden', border: index === 0 ? '2px solid var(--primary-color)' : '1px solid rgba(255,255,255,0.1)' }}>
+                  <img src={preview} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button onClick={() => removeImage(index)} style={{ position: 'absolute', top: '2px', right: '2px', background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', padding: '2px', color: 'white', cursor: 'pointer' }}><X size={12} /></button>
+                </div>
+              ))}
+              
+              {imagePreviews.length < 5 && (
+                <button 
+                  onClick={() => document.getElementById('imageInput').click()}
+                  style={{ width: '70px', height: '70px', borderRadius: '1rem', border: '2px dashed rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                >
+                  <Plus size={24} />
+                </button>
+              )}
+            </div>
+
+            <input 
+              id="imageInput" 
+              type="file" 
+              hidden 
+              multiple
+              accept="image/*" 
+              onChange={handleImagesUpload}
+            />
           </div>
         </div>
 
