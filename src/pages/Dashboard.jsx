@@ -245,26 +245,23 @@ const Dashboard = () => {
               <div className="glass-card" style={{ height: '100%', borderRadius: '1.75rem', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ position: 'relative', width: '100%', paddingTop: '100%' }}>
                   <img src={item.image_url} alt={item.title} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ padding: '1.5rem' }}>
                   <div style={{ 
-                    position: 'absolute', 
-                    top: '1rem', 
-                    left: '1rem', 
-                    background: 'rgba(5,5,5,0.6)', 
-                    backdropFilter: 'blur(12px)',
-                    padding: '0.5rem 1rem', 
-                    borderRadius: '1rem', 
-                    fontSize: '0.7rem', 
+                    display: 'inline-block',
+                    background: 'rgba(139, 92, 246, 0.1)', 
+                    padding: '0.3rem 0.6rem', 
+                    borderRadius: '0.5rem', 
+                    fontSize: '0.6rem', 
                     fontWeight: '800', 
                     textTransform: 'uppercase', 
                     letterSpacing: '0.1em',
                     color: '#8b5cf6',
-                    border: '1px solid rgba(139, 92, 246, 0.3)',
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    marginBottom: '0.75rem'
                   }}>
                     {item.category}
                   </div>
-                </div>
-                <div style={{ padding: '1.5rem' }}>
                   <h3 style={{ fontSize: '1.2rem', marginBottom: '1.25rem', color: 'white', lineHeight: '1.4' }}>{item.title}</h3>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
