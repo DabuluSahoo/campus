@@ -18,6 +18,7 @@ import PostItem from './pages/PostItem';
 import ItemDetails from './pages/ItemDetails';
 import Chat from './pages/Chat';
 import Profile from './pages/Profile';
+import Logo from './components/Logo';
 
 const App = () => {
   const [session, setSession] = useState(null);
@@ -89,17 +90,8 @@ const App = () => {
       zIndex: 1000,
       boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
     }}>
-      <Link to="/" style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '0.5rem', 
-        textDecoration: 'none',
-        color: 'var(--text-primary)',
-        fontWeight: '700',
-        fontSize: '1.25rem'
-      }}>
-        <ShoppingBag className="text-primary" style={{ color: 'var(--primary-color)' }} />
-        <span>Campus<span style={{ color: 'var(--primary-color)' }}>Market</span></span>
+      <Link to="/" style={{ textDecoration: 'none' }}>
+        <Logo size={45} />
       </Link>
 
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
