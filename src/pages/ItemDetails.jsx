@@ -224,20 +224,98 @@ const ItemDetails = () => {
 
       {/* High-End Fullscreen Lightbox */}
       {isLightboxOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100vh', background: 'rgba(0,0,0,0.98)', backdropFilter: 'blur(20px)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.3s ease' }}>
-          <button onClick={() => setIsLightboxOpen(false)} style={{ position: 'absolute', top: '2rem', right: '2rem', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '1rem', borderRadius: '50%', cursor: 'pointer', zIndex: 3100 }}><X size={32} /></button>
+        <div 
+          onClick={() => setIsLightboxOpen(false)}
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            width: '100%', 
+            height: '100vh', 
+            background: 'rgba(5,5,5,0.98)', 
+            backdropFilter: 'blur(30px)', 
+            zIndex: 5000, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            animation: 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            cursor: 'zoom-out'
+          }}
+        >
+          {/* Isolated Close Button */}
+          <button 
+            onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(false); }}
+            style={{ 
+              position: 'fixed', 
+              top: '2rem', 
+              right: '2rem', 
+              background: 'rgba(255,255,255,0.1)', 
+              border: '1px solid rgba(255,255,255,0.2)', 
+              color: 'white', 
+              width: '56px', 
+              height: '56px', 
+              borderRadius: '50%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              cursor: 'pointer', 
+              zIndex: 5100,
+              transition: 'all 0.3s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+          >
+            <X size={32} />
+          </button>
           
-          <div style={{ width: '90%', height: '80%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img src={images[selectedImage]} alt="" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '1rem', boxShadow: '0 30px 60px rgba(0,0,0,0.5)' }} />
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{ 
+              width: '90%', 
+              maxWidth: '1200px',
+              height: '80%', 
+              position: 'relative', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              cursor: 'default'
+            }}
+          >
+            <img 
+              src={images[selectedImage]} 
+              alt="" 
+              style={{ 
+                maxWidth: '100%', 
+                maxHeight: '100%', 
+                objectFit: 'contain', 
+                borderRadius: '1.5rem', 
+                boxShadow: '0 40px 100px rgba(0,0,0,0.8)',
+                border: '1px solid rgba(255,255,255,0.05)'
+              }} 
+            />
             
             {images.length > 1 && (
               <>
-                <button onClick={prevImage} style={{ position: 'absolute', left: '-2rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '1.5rem', borderRadius: '50%', cursor: 'pointer' }}><ChevronLeft size={40} /></button>
-                <button onClick={nextImage} style={{ position: 'absolute', right: '-2rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '1.5rem', borderRadius: '50%', cursor: 'pointer' }}><ChevronRight size={40} /></button>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); prevImage(); }} 
+                  style={{ position: 'fixed', left: '2rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '1.5rem', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.3s' }}
+                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                >
+                  <ChevronLeft size={40} />
+                </button>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); nextImage(); }} 
+                  style={{ position: 'fixed', right: '2rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '1.5rem', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.3s' }}
+                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                >
+                  <ChevronRight size={40} />
+                </button>
               </>
             )}
             
-            <div style={{ position: 'absolute', bottom: '-4rem', color: 'white', fontWeight: '600', fontSize: '1.2rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem 1.5rem', borderRadius: '2rem' }}>
+            <div style={{ position: 'fixed', bottom: '3rem', color: 'rgba(255,255,255,0.6)', fontWeight: '700', fontSize: '1.1rem', background: 'rgba(255,255,255,0.05)', padding: '0.6rem 1.5rem', borderRadius: '2rem', border: '1px solid rgba(255,255,255,0.1)' }}>
               {selectedImage + 1} / {images.length}
             </div>
           </div>
