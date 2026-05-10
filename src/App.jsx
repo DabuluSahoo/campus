@@ -7,9 +7,8 @@ import {
   User, 
   LogOut,
   Loader2,
-  Menu,
-  X,
-  ChevronRight
+  ChevronRight,
+  Settings
 } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
@@ -59,7 +58,7 @@ const App = () => {
   const fetchUserProfile = async (userId) => {
     const { data } = await supabase
       .from('profiles')
-      .select('avatar_url')
+      .select('full_name, avatar_url, hostel')
       .eq('id', userId)
       .single();
     if (data) setProfile(data);
@@ -86,15 +85,14 @@ const App = () => {
         justifyContent: 'space-between',
         padding: '0 1.5rem',
         zIndex: 2000,
-        borderRadius: '1.25rem',
+        borderRadius: '1.5rem',
         border: '1px solid rgba(255,255,255,0.08)'
       }}>
         <Link to="/" style={{ textDecoration: 'none' }} onClick={() => setIsMenuOpen(false)}>
           <Logo size={36} />
         </Link>
 
-        {/* Right Side Controls */}
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           {/* Desktop Only Links */}
           <div className="desktop-links" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <Link to="/dashboard" className="nav-link"><LayoutDashboard size={20} /></Link>
@@ -102,23 +100,32 @@ const App = () => {
             <Link to="/chat" className="nav-link"><MessageSquare size={20} /></Link>
           </div>
 
-          {/* Quick Access Mobile + Desktop */}
-          <Link to="/post" className="nav-link mobile-only-link"><PlusSquare size={22} /></Link>
-          <Link to="/profile" className="nav-link" style={{ padding: '0.5rem' }}>
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="P" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
-            ) : <User size={22} />}
-          </Link>
-
-          {/* Hamburger Icon */}
-          <button className="mobile-menu-btn" onClick={toggleMenu} style={{ 
+          {/* Unified Avatar Trigger (Mobile & Desktop) */}
+          <button onClick={toggleMenu} style={{ 
             background: 'none', 
             border: 'none', 
-            color: 'white', 
+            padding: '2px', 
             cursor: 'pointer',
-            padding: '0.5rem'
-          }}>
-            {isMenuOpen ? <X size={26} /> : <Menu size={26} />}
+            borderRadius: '50%',
+            transition: 'transform 0.2s'
+          }}
+          className="avatar-trigger"
+          >
+            <div style={{ 
+              width: '38px', 
+              height: '38px', 
+              borderRadius: '50%', 
+              overflow: 'hidden', 
+              border: isMenuOpen ? '2px solid var(--primary-color)' : '2px solid rgba(255,255,255,0.1)',
+              background: 'rgba(255,255,255,0.05)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : <User size={20} color="white" />}
+            </div>
           </button>
 
           {/* Desktop Only Logout */}
@@ -128,7 +135,7 @@ const App = () => {
         </div>
       </nav>
 
-      {/* Mobile Fullscreen Menu */}
+      {/* Mobile-First Profile Dropdown Menu */}
       <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`} style={{
         position: 'fixed',
         top: 0,
@@ -140,24 +147,60 @@ const App = () => {
         zIndex: 1500,
         display: 'flex',
         flexDirection: 'column',
-        padding: '8rem 2rem 2rem',
+        padding: '7rem 1.5rem 2rem',
         transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
         opacity: isMenuOpen ? 1 : 0,
         visibility: isMenuOpen ? 'visible' : 'hidden',
         transform: isMenuOpen ? 'translateY(0)' : 'translateY(-20px)'
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {/* User Header Section */}
+        <div style={{ 
+          padding: '2rem', 
+          background: 'rgba(255,255,255,0.03)', 
+          borderRadius: '2rem', 
+          border: '1px solid rgba(255,255,255,0.05)',
+          marginBottom: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center'
+        }}>
+           <div style={{ 
+              width: '80px', 
+              height: '80px', 
+              borderRadius: '50%', 
+              overflow: 'hidden', 
+              border: '3px solid var(--primary-color)',
+              marginBottom: '1rem',
+              boxShadow: '0 10px 30px var(--primary-glow)'
+            }}>
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : <User size={40} color="white" style={{ marginTop: '15px' }} />}
+            </div>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '0.25rem' }}>{profile?.full_name || 'Student'}</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{session?.user.email}</p>
+            
+            <Link to="/profile" onClick={() => setIsMenuOpen(false)} style={{ 
+              marginTop: '1.5rem', 
+              color: 'var(--primary-color)', 
+              textDecoration: 'none', 
+              fontWeight: '700',
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              View Profile <ChevronRight size={16} />
+            </Link>
+        </div>
+
+        {/* Navigation Links */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {[
-            { to: '/dashboard', label: 'Marketplace', icon: <LayoutDashboard size={24} /> },
-            { to: '/post', label: 'Post Listing', icon: <PlusSquare size={24} /> },
-            { to: '/chat', label: 'Messages', icon: <MessageSquare size={24} /> },
-            { 
-              to: '/profile', 
-              label: 'My Profile', 
-              icon: profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt="" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
-              ) : <User size={24} /> 
-            }
+            { to: '/dashboard', label: 'Marketplace', icon: <LayoutDashboard size={22} /> },
+            { to: '/post', label: 'Post New Item', icon: <PlusSquare size={22} /> },
+            { to: '/chat', label: 'Messages & Chats', icon: <MessageSquare size={22} /> },
           ].map(link => (
             <Link 
               key={link.to} 
@@ -167,61 +210,59 @@ const App = () => {
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'space-between',
-                padding: '1.5rem',
-                borderRadius: '1.5rem',
-                background: 'rgba(255,255,255,0.03)',
+                padding: '1.25rem 1.5rem',
+                borderRadius: '1.25rem',
+                background: 'rgba(255,255,255,0.02)',
                 textDecoration: 'none',
                 color: 'white',
-                fontSize: '1.25rem',
+                fontSize: '1.1rem',
                 fontWeight: '600',
-                border: '1px solid rgba(255,255,255,0.05)'
+                border: '1px solid rgba(255,255,255,0.03)'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ color: 'var(--primary-color)' }}>{link.icon}</span>
+                <span style={{ color: 'var(--text-secondary)' }}>{link.icon}</span>
                 {link.label}
               </div>
-              <ChevronRight size={20} color="var(--text-secondary)" />
+              <ChevronRight size={18} color="rgba(255,255,255,0.2)" />
             </Link>
           ))}
+          
           <button 
             onClick={() => { handleLogout(); setIsMenuOpen(false); }}
             style={{ 
-              marginTop: '2rem',
-              padding: '1.5rem',
-              borderRadius: '1.5rem',
-              background: 'rgba(239, 68, 68, 0.1)',
+              marginTop: '1.5rem',
+              padding: '1.25rem',
+              borderRadius: '1.25rem',
+              background: 'rgba(239, 68, 68, 0.05)',
               color: '#ef4444',
-              border: '1px solid rgba(239, 68, 68, 0.2)',
-              fontSize: '1.25rem',
+              border: '1px solid rgba(239, 68, 68, 0.1)',
+              fontSize: '1.1rem',
               fontWeight: '700',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '1rem'
+              gap: '1rem',
+              cursor: 'pointer'
             }}
           >
-            <LogOut size={24} /> Logout Account
+            <LogOut size={22} /> Logout Account
           </button>
         </div>
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .mobile-menu-btn { display: none; }
-        .mobile-only-link { display: none; }
         .desktop-links { display: flex; }
+        .avatar-trigger:hover { transform: scale(1.05); }
         
         @media (max-width: 800px) {
           .desktop-links { display: none !important; }
-          .mobile-menu-btn { display: block !important; }
-          .mobile-only-link { display: flex !important; }
           .app-container { padding-top: 6.5rem !important; }
         }
         
         @media (min-width: 801px) {
-          .mobile-menu-btn { display: none !important; }
-          .mobile-only-link { display: none !important; }
           .desktop-links { display: flex !important; }
+          .mobile-menu { width: 350px !important; height: auto !important; border-radius: 2rem !important; right: 2.5% !important; left: auto !important; top: 6rem !important; border: 1px solid rgba(255,255,255,0.1) !important; padding: 2rem !important; box-shadow: 0 30px 60px rgba(0,0,0,0.5) !important; }
         }
         
         .nav-link {
@@ -236,10 +277,6 @@ const App = () => {
         .nav-link:hover {
           color: white;
           background: rgba(255,255,255,0.05);
-        }
-        .logout-btn:hover {
-          color: #ef4444;
-          background: rgba(239, 68, 68, 0.1);
         }
       `}} />
     </>
