@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Upload, MapPin, DollarSign, Loader2 } from 'lucide-react';
+import { Upload, MapPin, DollarSign, Loader2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,8 +12,6 @@ const PostItem = () => {
   const [location, setLocation] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [aiSuggestion, setAiSuggestion] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleImageUpload = (e) => {
@@ -21,22 +19,7 @@ const PostItem = () => {
     if (file) {
       setSelectedFile(file);
       setImagePreview(URL.createObjectURL(file));
-      simulateAIScan();
     }
-  };
-
-  const simulateAIScan = () => {
-    setIsScanning(true);
-    setAiSuggestion(null);
-    setTimeout(() => {
-      setIsScanning(false);
-      setAiSuggestion({
-        min: 20,
-        max: 35,
-        confidence: 'High',
-        type: 'Electronics - Peripheral'
-      });
-    }, 2500);
   };
 
   const handleSubmit = async (e) => {
@@ -98,24 +81,26 @@ const PostItem = () => {
   return (
     <div className="animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto' }}>
       <header style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '2.5rem' }}>List an Item</h1>
-        <p>Complete the details below to reach thousands of students.</p>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: '800' }}>List an Item</h1>
+        <p style={{ color: 'var(--text-secondary)' }}>Complete the details below to reach thousands of students.</p>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem' }}>
+      <div className="post-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="input-group">
             <label className="input-label">Item Image</label>
             <div 
               className="glass" 
               style={{ 
-                height: '300px', 
+                height: '350px', 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center', 
                 position: 'relative',
                 overflow: 'hidden',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                borderRadius: '2rem',
+                border: '2px dashed rgba(255,255,255,0.1)'
               }}
               onClick={() => document.getElementById('imageInput').click()}
             >
@@ -135,36 +120,10 @@ const PostItem = () => {
                 onChange={handleImageUpload}
               />
             </div>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '1rem', textAlign: 'center' }}>
+              Upload a clear photo to attract more buyers.
+            </p>
           </div>
-
-          {isScanning && (
-            <div className="glass" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', borderColor: 'var(--primary-color)' }}>
-              <Loader2 className="animate-spin text-primary" style={{ color: 'var(--primary-color)' }} />
-              <div>
-                <p style={{ fontWeight: '600', color: 'var(--text-primary)' }}>AI is analyzing your image...</p>
-                <p style={{ fontSize: '0.85rem' }}>Identifying product and market trends.</p>
-              </div>
-            </div>
-          )}
-
-          {aiSuggestion && (
-            <div className="glass" style={{ padding: '1.5rem', background: 'rgba(99, 102, 241, 0.1)', borderColor: 'var(--primary-color)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary-color)' }}>
-                <Sparkles size={18} />
-                <span style={{ fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase' }}>AI Price Suggestion</span>
-              </div>
-              <h2 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>₹{aiSuggestion.min} - ₹{aiSuggestion.max}</h2>
-              <p style={{ fontSize: '0.85rem' }}>Detected as: <strong>{aiSuggestion.type}</strong></p>
-              <button 
-                type="button"
-                className="btn btn-secondary" 
-                style={{ marginTop: '1rem', width: '100%', fontSize: '0.85rem' }}
-                onClick={() => setPrice(aiSuggestion.min)}
-              >
-                Apply Mid-Range Price
-              </button>
-            </div>
-          )}
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -214,7 +173,7 @@ const PostItem = () => {
             ></textarea>
           </div>
 
-          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', justifyContent: 'center', height: '3.5rem', fontSize: '1.1rem' }}>
+          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', justifyContent: 'center', height: '3.5rem', fontSize: '1.1rem', marginTop: '1rem' }}>
             {loading ? <Loader2 className="animate-spin" /> : 'List Item Now'}
           </button>
         </form>
@@ -223,6 +182,10 @@ const PostItem = () => {
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .animate-spin { animation: spin 1s linear infinite; }
+        
+        @media (max-width: 768px) {
+          .post-grid { grid-template-columns: 1fr !important; }
+        }
       `}} />
     </div>
   );
