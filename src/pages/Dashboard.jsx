@@ -59,6 +59,15 @@ const Dashboard = () => {
     setSortBy('newest');
   };
 
+  const parseImageUrl = (url) => {
+    try {
+      const parsed = JSON.parse(url);
+      return Array.isArray(parsed) ? parsed[0] : url;
+    } catch (e) {
+      return url;
+    }
+  };
+
   const filteredItems = items
     .filter(item => {
       const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase()) || 
@@ -360,7 +369,7 @@ const Dashboard = () => {
             <Link key={item.id} to={`/item/${item.id}`} style={{ textDecoration: 'none' }}>
               <div className="glass-card" style={{ height: '100%', borderRadius: '1.75rem', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ position: 'relative', width: '100%', paddingTop: '100%' }}>
-                  <img src={item.image_url} alt={item.title} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={parseImageUrl(item.image_url)} alt={item.title} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ padding: '1.5rem' }}>
                   <div style={{ 

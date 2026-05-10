@@ -30,6 +30,15 @@ const Profile = () => {
     fetchProfileData();
   }, []);
 
+  const parseImageUrl = (url) => {
+    try {
+      const parsed = JSON.parse(url);
+      return Array.isArray(parsed) ? parsed[0] : url;
+    } catch (e) {
+      return url;
+    }
+  };
+
   const fetchProfileData = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -242,7 +251,7 @@ const Profile = () => {
           myListings.map(item => (
             <div key={item.id} className="glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ position: 'relative', paddingTop: '60%' }}>
-                <img src={item.image_url} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={parseImageUrl(item.image_url)} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                 <div style={{ position: 'absolute', top: '0.75rem', left: '0.75rem', background: item.status === 'active' ? 'var(--tertiary-color)' : 'var(--text-secondary)', padding: '0.3rem 0.7rem', borderRadius: '2rem', fontSize: '0.75rem', fontWeight: '700' }}>{item.status}</div>
               </div>
               <div style={{ padding: '1.25rem' }}>
@@ -260,7 +269,7 @@ const Profile = () => {
           wishlistItems.map(item => (
             <div key={item.id} className="glass-card" style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ position: 'relative', paddingTop: '60%' }}>
-                <img src={item.image_url} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={parseImageUrl(item.image_url)} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div style={{ padding: '1.25rem' }}>
                 <h3 style={{ marginBottom: '0.5rem' }}>{item.title}</h3>
