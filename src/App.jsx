@@ -72,7 +72,7 @@ const App = () => {
 
   const Navbar = () => (
     <>
-      <nav className="global-nav glass" style={{
+      <nav className="global-nav" style={{
         position: 'fixed',
         top: '1rem',
         left: '50%',
@@ -86,7 +86,9 @@ const App = () => {
         padding: '0 1.5rem',
         zIndex: 2000,
         borderRadius: '1.5rem',
-        border: '1px solid rgba(255,255,255,0.08)'
+        background: '#0a0a0a', /* Solid obsidian background */
+        border: '1px solid rgba(255,255,255,0.1)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
       }}>
         <Link to="/" style={{ textDecoration: 'none' }} onClick={() => setIsMenuOpen(false)}>
           <Logo size={36} />
