@@ -135,8 +135,8 @@ const App = () => {
         left: 0,
         width: '100%',
         height: '100vh',
-        background: 'rgba(5,5,5,0.95)',
-        backdropFilter: 'blur(20px)',
+        background: 'rgba(5,5,5,0.98)',
+        backdropFilter: 'blur(30px)',
         zIndex: 1500,
         display: 'flex',
         flexDirection: 'column',
@@ -146,12 +146,18 @@ const App = () => {
         visibility: isMenuOpen ? 'visible' : 'hidden',
         transform: isMenuOpen ? 'translateY(0)' : 'translateY(-20px)'
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {[
             { to: '/dashboard', label: 'Marketplace', icon: <LayoutDashboard size={24} /> },
             { to: '/post', label: 'Post Listing', icon: <PlusSquare size={24} /> },
             { to: '/chat', label: 'Messages', icon: <MessageSquare size={24} /> },
-            { to: '/profile', label: 'Profile', icon: <User size={24} /> }
+            { 
+              to: '/profile', 
+              label: 'My Profile', 
+              icon: profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }} />
+              ) : <User size={24} /> 
+            }
           ].map(link => (
             <Link 
               key={link.to} 
@@ -205,11 +211,17 @@ const App = () => {
         .mobile-only-link { display: none; }
         .desktop-links { display: flex; }
         
-        @media (max-width: 768px) {
+        @media (max-width: 800px) {
           .desktop-links { display: none !important; }
           .mobile-menu-btn { display: block !important; }
           .mobile-only-link { display: flex !important; }
           .app-container { padding-top: 6.5rem !important; }
+        }
+        
+        @media (min-width: 801px) {
+          .mobile-menu-btn { display: none !important; }
+          .mobile-only-link { display: none !important; }
+          .desktop-links { display: flex !important; }
         }
         
         .nav-link {
