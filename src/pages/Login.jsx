@@ -58,7 +58,7 @@ const Login = () => {
         zIndex: 0
       }}>
         <img 
-          src="/login_bg_premium_1778410137262.png" 
+          src="/login_bg_premium.png" 
           alt="" 
           style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4 }} 
         />

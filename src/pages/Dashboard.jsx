@@ -77,7 +77,7 @@ const Dashboard = () => {
           zIndex: 0
         }}>
           <img 
-            src="/dashboard_hero_elite_1778410177351.png" 
+            src="/dashboard_hero_elite.png" 
             alt="Hero" 
             style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
           />
