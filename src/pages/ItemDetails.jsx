@@ -232,9 +232,9 @@ const ItemDetails = () => {
             left: 0, 
             width: '100%', 
             height: '100vh', 
-            background: 'rgba(5,5,5,0.98)', 
+            background: '#050505', 
             backdropFilter: 'blur(30px)', 
-            zIndex: 5000, 
+            zIndex: 10000, 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
@@ -242,38 +242,39 @@ const ItemDetails = () => {
             cursor: 'zoom-out'
           }}
         >
-          {/* Isolated Close Button */}
+          {/* Isolated Close Button - Moved to Top Left to avoid navbar clash */}
           <button 
             onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(false); }}
             style={{ 
               position: 'fixed', 
               top: '2rem', 
-              right: '2rem', 
+              left: '2rem', 
               background: 'rgba(255,255,255,0.1)', 
               border: '1px solid rgba(255,255,255,0.2)', 
               color: 'white', 
-              width: '56px', 
-              height: '56px', 
+              width: '60px', 
+              height: '60px', 
               borderRadius: '50%', 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
               cursor: 'pointer', 
-              zIndex: 5100,
-              transition: 'all 0.3s'
+              zIndex: 10100,
+              transition: 'all 0.3s',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
             }}
-            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
+            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.3)'}
             onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
           >
-            <X size={32} />
+            <X size={36} />
           </button>
           
           <div 
             onClick={(e) => e.stopPropagation()}
             style={{ 
-              width: '90%', 
+              width: '95%', 
               maxWidth: '1200px',
-              height: '80%', 
+              height: '85%', 
               position: 'relative', 
               display: 'flex', 
               alignItems: 'center', 
@@ -288,8 +289,8 @@ const ItemDetails = () => {
                 maxWidth: '100%', 
                 maxHeight: '100%', 
                 objectFit: 'contain', 
-                borderRadius: '1.5rem', 
-                boxShadow: '0 40px 100px rgba(0,0,0,0.8)',
+                borderRadius: '1rem', 
+                boxShadow: '0 50px 100px rgba(0,0,0,0.9)',
                 border: '1px solid rgba(255,255,255,0.05)'
               }} 
             />
@@ -298,24 +299,24 @@ const ItemDetails = () => {
               <>
                 <button 
                   onClick={(e) => { e.stopPropagation(); prevImage(); }} 
-                  style={{ position: 'fixed', left: '2rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '1.5rem', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.3s' }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
-                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                  style={{ position: 'fixed', left: '1.5rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '1.25rem', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.3s', zIndex: 10100 }}
+                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.5)'}
                 >
-                  <ChevronLeft size={40} />
+                  <ChevronLeft size={36} />
                 </button>
                 <button 
                   onClick={(e) => { e.stopPropagation(); nextImage(); }} 
-                  style={{ position: 'fixed', right: '2rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '1.5rem', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.3s' }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
-                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                  style={{ position: 'fixed', right: '1.5rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '1.25rem', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.3s', zIndex: 10100 }}
+                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.5)'}
                 >
-                  <ChevronRight size={40} />
+                  <ChevronRight size={36} />
                 </button>
               </>
             )}
             
-            <div style={{ position: 'fixed', bottom: '3rem', color: 'rgba(255,255,255,0.6)', fontWeight: '700', fontSize: '1.1rem', background: 'rgba(255,255,255,0.05)', padding: '0.6rem 1.5rem', borderRadius: '2rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ position: 'fixed', bottom: '2rem', color: 'rgba(255,255,255,0.8)', fontWeight: '800', fontSize: '1.2rem', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 2rem', borderRadius: '2rem', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>
               {selectedImage + 1} / {images.length}
             </div>
           </div>
