@@ -177,6 +177,7 @@ const PostItem = () => {
                 <option>Furniture</option>
                 <option>Appliances</option>
                 <option>Clothing</option>
+                <option>Others</option>
               </select>
             </div>
             <div className="input-group">

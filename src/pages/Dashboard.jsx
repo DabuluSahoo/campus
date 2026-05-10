@@ -9,7 +9,8 @@ const CATEGORIES = [
   { name: 'Electronics', icon: <Tag size={18} /> },
   { name: 'Furniture', icon: <Tag size={18} /> },
   { name: 'Appliances', icon: <Tag size={18} /> },
-  { name: 'Clothing', icon: <Tag size={18} /> }
+  { name: 'Clothing', icon: <Tag size={18} /> },
+  { name: 'Others', icon: <Tag size={18} /> }
 ];
 
 const Dashboard = () => {
