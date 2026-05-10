@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, MapPin, Tag, Loader2, X, TrendingUp, Clock, ArrowRight } from 'lucide-react';
+import { Search, Filter, MapPin, Tag, Loader2, X, TrendingUp, Clock, ArrowRight, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
@@ -174,6 +174,24 @@ const Dashboard = () => {
             </button>
           </div>
         </div>
+
+        {/* Bouncing Scroll Indicator */}
+        <div style={{
+          position: 'absolute',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.5rem',
+          color: 'var(--text-secondary)',
+          opacity: 0.6,
+          animation: 'bounce 2s infinite'
+        }}>
+          <span style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em' }}>SCROLL</span>
+          <ChevronDown size={24} />
+        </div>
       </section>
 
       {/* Categories */}
@@ -219,25 +237,34 @@ const Dashboard = () => {
                   <div style={{ 
                     position: 'absolute', 
                     top: '1rem', 
-                    right: '1rem', 
-                    background: 'rgba(255,255,255,0.9)', 
+                    left: '1rem', 
+                    background: 'rgba(5,5,5,0.6)', 
+                    backdropFilter: 'blur(10px)',
                     padding: '0.4rem 0.8rem', 
                     borderRadius: '0.75rem', 
+                    fontSize: '0.65rem', 
                     fontWeight: '800', 
-                    color: 'black', 
-                    fontSize: '0.9rem'
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.1em',
+                    color: '#8b5cf6',
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
                   }}>
-                    ₹{item.price}
+                    {item.category}
                   </div>
                 </div>
                 <div style={{ padding: '1.25rem' }}>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--primary-color)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{item.category}</div>
                   <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'white' }}>{item.title}</h3>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                      <MapPin size={14} /> {item.location}
-                    </span>
-                    <ArrowRight size={16} color="var(--text-secondary)" />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                      <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'white' }}>₹{item.price}</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                        <MapPin size={12} /> {item.location}
+                      </span>
+                    </div>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <ArrowRight size={16} color="white" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -276,6 +303,13 @@ const Dashboard = () => {
       <style dangerouslySetInnerHTML={{ __html: `
         .loader-ring { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+          40% { transform: translateY(-10px) translateX(-50%); }
+          60% { transform: translateY(-5px) translateX(-50%); }
+        }
+        
         div::-webkit-scrollbar { display: none; }
       `}} />
     </div>
