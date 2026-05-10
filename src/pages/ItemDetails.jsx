@@ -232,41 +232,41 @@ const ItemDetails = () => {
             left: 0, 
             width: '100%', 
             height: '100vh', 
-            background: '#050505', 
+            background: '#020202', // Even darker for focus
             backdropFilter: 'blur(30px)', 
-            zIndex: 10000, 
+            zIndex: 99999, // Ultra-high to cover EVERYTHING including navbar
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
-            animation: 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            animation: 'fadeIn 0.2s ease-out',
             cursor: 'zoom-out'
           }}
         >
-          {/* Isolated Close Button - Moved to Top Left to avoid navbar clash */}
+          {/* Shifted Close Button - Top Right but lowered to clear navbar */}
           <button 
             onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(false); }}
             style={{ 
               position: 'fixed', 
-              top: '2rem', 
-              left: '2rem', 
-              background: 'rgba(255,255,255,0.1)', 
-              border: '1px solid rgba(255,255,255,0.2)', 
+              top: '7rem', // Lowered significantly to clear navbar area
+              right: '2rem', 
+              background: 'rgba(255,255,255,0.15)', 
+              border: '1px solid rgba(255,255,255,0.3)', 
               color: 'white', 
-              width: '60px', 
-              height: '60px', 
+              width: '64px', 
+              height: '64px', 
               borderRadius: '50%', 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
               cursor: 'pointer', 
-              zIndex: 10100,
-              transition: 'all 0.3s',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+              zIndex: 100000,
+              boxShadow: '0 15px 40px rgba(0,0,0,0.8)',
+              transition: 'transform 0.2s'
             }}
-            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.3)'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+            onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+            onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
-            <X size={36} />
+            <X size={36} strokeWidth={2.5} />
           </button>
           
           <div 
@@ -274,7 +274,7 @@ const ItemDetails = () => {
             style={{ 
               width: '95%', 
               maxWidth: '1200px',
-              height: '85%', 
+              height: '75%', // Slightly smaller to give breathing room for lowered X
               position: 'relative', 
               display: 'flex', 
               alignItems: 'center', 
@@ -290,7 +290,7 @@ const ItemDetails = () => {
                 maxHeight: '100%', 
                 objectFit: 'contain', 
                 borderRadius: '1rem', 
-                boxShadow: '0 50px 100px rgba(0,0,0,0.9)',
+                boxShadow: '0 60px 120px rgba(0,0,0,1)',
                 border: '1px solid rgba(255,255,255,0.05)'
               }} 
             />
@@ -299,24 +299,20 @@ const ItemDetails = () => {
               <>
                 <button 
                   onClick={(e) => { e.stopPropagation(); prevImage(); }} 
-                  style={{ position: 'fixed', left: '1.5rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '1.25rem', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.3s', zIndex: 10100 }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.5)'}
+                  style={{ position: 'fixed', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '1.25rem', borderRadius: '50%', cursor: 'pointer', zIndex: 100000 }}
                 >
-                  <ChevronLeft size={36} />
+                  <ChevronLeft size={40} />
                 </button>
                 <button 
                   onClick={(e) => { e.stopPropagation(); nextImage(); }} 
-                  style={{ position: 'fixed', right: '1.5rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '1.25rem', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.3s', zIndex: 10100 }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.5)'}
+                  style={{ position: 'fixed', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '1.25rem', borderRadius: '50%', cursor: 'pointer', zIndex: 100000 }}
                 >
-                  <ChevronRight size={36} />
+                  <ChevronRight size={40} />
                 </button>
               </>
             )}
             
-            <div style={{ position: 'fixed', bottom: '2rem', color: 'rgba(255,255,255,0.8)', fontWeight: '800', fontSize: '1.2rem', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 2rem', borderRadius: '2rem', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>
+            <div style={{ position: 'fixed', bottom: '2rem', color: 'rgba(255,255,255,0.9)', fontWeight: '900', fontSize: '1.3rem', background: 'rgba(0,0,0,0.5)', padding: '0.6rem 2rem', borderRadius: '2rem', border: '1px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)' }}>
               {selectedImage + 1} / {images.length}
             </div>
           </div>
