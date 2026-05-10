@@ -108,10 +108,19 @@ const ItemDetails = () => {
 
   if (!item) return <div style={{ textAlign: 'center', padding: '5rem' }}>Item not found</div>;
 
-  // Handle image URLs (handle both legacy image_url and new image_urls array)
-  const images = item.image_urls && item.image_urls.length > 0 
-    ? item.image_urls 
-    : [item.image_url];
+  // Handle image URLs (handle legacy single URL and new JSON string array)
+  let images = [];
+  try {
+    const parsed = JSON.parse(item.image_url);
+    if (Array.isArray(parsed)) {
+      images = parsed;
+    } else {
+      images = [item.image_url];
+    }
+  } catch (e) {
+    // If it's not JSON, it's a single legacy URL
+    images = [item.image_url];
+  }
 
   const nextImage = () => setSelectedImage((prev) => (prev + 1) % images.length);
   const prevImage = () => setSelectedImage((prev) => (prev - 1 + images.length) % images.length);

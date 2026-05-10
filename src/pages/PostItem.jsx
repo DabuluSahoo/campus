@@ -67,7 +67,7 @@ const PostItem = () => {
         uploadedUrls.push(publicUrl);
       }
 
-      // 2. Save to Database
+      // 2. Save to Database - Storing multiple images as a JSON string in the existing image_url column
       const { error: dbError } = await supabase
         .from('items')
         .insert([
@@ -79,8 +79,7 @@ const PostItem = () => {
             location,
             seller_id: user.id,
             seller_email: user.email,
-            image_url: uploadedUrls[0], // Main wallpaper image
-            image_urls: uploadedUrls,    // All images as array
+            image_url: JSON.stringify(uploadedUrls), // Pack all images into this one column
             status: 'active'
           }
         ]);
