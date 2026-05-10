@@ -132,14 +132,13 @@ const ItemDetails = () => {
       </button>
 
       <div className="item-details-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '3.5rem' }}>
-        {/* Left: Interactive Gallery */}
-        <div style={{ position: 'sticky', top: '8rem', height: 'fit-content' }}>
+        {/* Left: Interactive Gallery - Sticky on desktop, relative on mobile */}
+        <div className="gallery-container" style={{ height: 'fit-content' }}>
           <div 
             className="glass-card main-image-container" 
             style={{ 
               borderRadius: '2.5rem', 
               overflow: 'hidden', 
-              height: '550px', 
               position: 'relative',
               cursor: 'zoom-in',
               border: '1px solid rgba(255,255,255,0.05)'
@@ -155,8 +154,8 @@ const ItemDetails = () => {
             
             {images.length > 1 && (
               <>
-                <button onClick={(e) => { e.stopPropagation(); prevImage(); }} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', border: 'none', color: 'white', padding: '0.75rem', borderRadius: '50%', cursor: 'pointer' }}><ChevronLeft size={24} /></button>
-                <button onClick={(e) => { e.stopPropagation(); nextImage(); }} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', border: 'none', color: 'white', padding: '0.75rem', borderRadius: '50%', cursor: 'pointer' }}><ChevronRight size={24} /></button>
+                <button className="gallery-nav-btn" onClick={(e) => { e.stopPropagation(); prevImage(); }} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', border: 'none', color: 'white', padding: '0.75rem', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><ChevronLeft size={24} /></button>
+                <button className="gallery-nav-btn" onClick={(e) => { e.stopPropagation(); nextImage(); }} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', border: 'none', color: 'white', padding: '0.75rem', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><ChevronRight size={24} /></button>
               </>
             )}
           </div>
@@ -333,9 +332,18 @@ const ItemDetails = () => {
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .animate-spin { animation: spin 1s linear infinite; }
         
+        /* Desktop Sticky Gallery */
+        @media (min-width: 901px) {
+          .gallery-container { position: sticky !important; top: 8rem !important; }
+          .main-image-container { height: 550px !important; }
+        }
+
+        /* Mobile Fluid Gallery */
         @media (max-width: 900px) {
           .item-details-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
-          .main-image-container { height: 400px !important; }
+          .main-image-container { height: 350px !important; border-radius: 1.5rem !important; }
+          .gallery-nav-btn { padding: 0.5rem !important; }
+          .gallery-nav-btn svg { width: 20px !important; height: 20px !important; }
         }
       `}} />
     </div>
